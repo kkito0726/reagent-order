@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: jooq
+  datasource:
+    url: jdbc:postgresql://localhost:5432/main
+    username: sa
+    password: pass1234
+    driver-class-name: org.postgresql.Driver
+
+jooq:
+  sql-dialect: POSTGRES # jOOQで使用するデータベースのSQL方言

@@ -1,0 +1,15 @@
+plugins {
+	id("org.flywaydb.flyway") version "9.2.3" // 最新のFlywayプラグインのバージョンに置き換えてください
+}
+
+dependencies {
+	implementation 'org.flywaydb:flyway-core:9.2.3' // 最新バージョンに置き換えてください
+}
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/main'
+	user = 'sa'
+	password = 'pass1234'
+	locations = ['filesystem:src/main/resources/db/migration']
+}
+

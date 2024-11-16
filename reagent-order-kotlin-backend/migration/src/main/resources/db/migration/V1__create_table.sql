@@ -1,0 +1,8 @@
+CREATE TABLE app_user (
+    id VARCHAR(50) PRIMARY KEY,
+    app_user_name VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deletedAt TIMESTAMP
+);
