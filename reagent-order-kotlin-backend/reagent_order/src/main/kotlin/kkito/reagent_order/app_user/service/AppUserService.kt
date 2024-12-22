@@ -21,10 +21,9 @@ open class AppUserService(
             appUserEntity.id.toString(),
             appUserEntity.appUserName.toString(),
             appUserEntity.email.toString(),
-            appUserEntity.password,
+            appUserEntity.password.value,
             appUserEntity.createdAt,
             appUserEntity.deletedAt
-
         )
     }
 }
