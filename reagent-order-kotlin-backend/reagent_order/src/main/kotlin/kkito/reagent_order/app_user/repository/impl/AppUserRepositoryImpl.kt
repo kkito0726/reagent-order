@@ -1,7 +1,7 @@
 package kkito.reagent_order.app_user.repository.impl
 
 import com.generate.jooq.Tables.APP_USER
-import kkito.reagent_order.app_user.model.AppUserEntity
+import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.repository.AppUserRepository
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository

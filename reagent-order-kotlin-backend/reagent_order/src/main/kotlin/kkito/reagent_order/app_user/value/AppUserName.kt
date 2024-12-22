@@ -1,4 +1,4 @@
-package kkito.reagent_order.app_user.model
+package kkito.reagent_order.app_user.value
 
 class AppUserName private constructor(val value: String) {
     init {

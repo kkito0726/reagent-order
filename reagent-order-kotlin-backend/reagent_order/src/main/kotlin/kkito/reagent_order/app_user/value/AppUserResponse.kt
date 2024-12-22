@@ -1,4 +1,4 @@
-package kkito.reagent_order.app_user.model
+package kkito.reagent_order.app_user.value
 
 import java.time.LocalDateTime
 import java.util.UUID

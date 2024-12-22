@@ -1,6 +1,6 @@
 package kkito.reagent_order.app_user.service.spec
 
-import kkito.reagent_order.app_user.model.AppUserEntity
+import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.repository.AppUserCheckDuplicate
 import org.springframework.stereotype.Service
 

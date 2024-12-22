@@ -1,8 +1,8 @@
 package kkito.reagent_order.app_user.repository.impl
 
 import com.generate.jooq.Tables.APP_USER
-import kkito.reagent_order.app_user.model.AppUserName
-import kkito.reagent_order.app_user.model.Email
+import kkito.reagent_order.app_user.value.AppUserName
+import kkito.reagent_order.app_user.value.Email
 import kkito.reagent_order.app_user.repository.AppUserCheckDuplicate
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository

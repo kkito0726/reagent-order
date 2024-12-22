@@ -1,4 +1,4 @@
-package kkito.reagent_order.app_user.model
+package kkito.reagent_order.app_user.value
 
 data class AppUserRequest(
     val appUserName: String,

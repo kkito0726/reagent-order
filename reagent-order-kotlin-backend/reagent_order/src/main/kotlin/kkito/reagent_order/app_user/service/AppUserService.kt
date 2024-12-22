@@ -1,7 +1,7 @@
 package kkito.reagent_order.app_user.service
 
-import kkito.reagent_order.app_user.model.AppUserEntity
-import kkito.reagent_order.app_user.model.AppUserResponse
+import kkito.reagent_order.app_user.entity.AppUserEntity
+import kkito.reagent_order.app_user.value.AppUserResponse
 import kkito.reagent_order.app_user.repository.AppUserRepository
 import kkito.reagent_order.app_user.service.spec.AppUserCreateSpec
 import org.springframework.stereotype.Service

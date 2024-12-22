@@ -2,7 +2,7 @@ package kkito.reagent_order.app_user
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
-import kkito.reagent_order.app_user.model.AppUserRequest
+import kkito.reagent_order.app_user.value.AppUserRequest
 import org.jooq.DSLContext
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
@@ -16,11 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Objects
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @SpringBootTest
 @AutoConfigureMockMvc
