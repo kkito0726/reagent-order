@@ -2,6 +2,10 @@ plugins {
 	id("org.flywaydb.flyway") version "9.2.3" // 最新のFlywayプラグインのバージョンに置き換えてください
 }
 
+bootJar {
+	enabled = false
+}
+
 dependencies {
 	implementation 'org.flywaydb:flyway-core:9.2.3' // 最新バージョンに置き換えてください
 }

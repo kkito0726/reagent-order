@@ -6,10 +6,6 @@ bootJar {
     enabled = false
 }
 
-jar {
-    enabled = false
-}
-
 dependencies {
     implementation 'org.jooq:jooq:3.17.7'
     jooqGenerator 'org.postgresql:postgresql:42.7.4'
