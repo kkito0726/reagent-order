@@ -1,9 +1,13 @@
 package kkito.reagent_order.app_user.value
 
+import kkito.reagent_order.error.BusinessLogicException
+import kkito.reagent_order.error.ErrorCode
+import org.springframework.http.HttpStatus
+
 class AppUserName private constructor(val value: String) {
     init {
         if (value.length !in 3..15) {
-            throw IllegalArgumentException("Userネームは3文字以上15文字以下で入力してください")
+            throw BusinessLogicException(HttpStatus.BAD_REQUEST, ErrorCode.E0001)
         }
     }
 

@@ -14,7 +14,6 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
         val errorResponse = ErrorResponse(
             exception.errorCode.code,
             exception.errorCode.message,
-            exception.httpStatus
         )
         println("""
             Error Code: ${errorResponse.errorCode}
