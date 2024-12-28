@@ -3,8 +3,8 @@ package kkito.reagent_order.app_user
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.app_user.value.AppUserRequest
+import kkito.reagent_order.error.ErrorCode
 import org.assertj.db.api.Assertions
-import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +38,7 @@ class AppUserTest(
     @Test
     fun ユーザー登録できる() {
         val request = AppUserRequest(
-            "test user name",
+            "テスト 太郎",
             "test_email@test.gmail.com",
             "Test_pass_12345678"
         )
@@ -50,7 +50,7 @@ class AppUserTest(
         changes.setEndPointNow()
 
         // レスポンスのアサート
-        val responseBody = JSONObject(resultAction.andReturn().response.contentAsString)
+        val responseBody = createResponseBodyJson(resultAction)
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
         assertEquals(responseBody.getString("email"), request.email)
@@ -79,5 +79,35 @@ class AppUserTest(
             .value("password").isEqualTo(request.password)
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()
+    }
+
+    @Test
+    fun ユーザー名が重複している場合_E_0004エラーになる() {
+        val request1 = AppUserRequest(
+            "test user name",
+            "test_email@test.gmail.com",
+            "Test_pass_12345678"
+        )
+
+        val request2 = AppUserRequest(
+            "test user name",
+            "test_email_2@test.gmail.com",
+            "Test_pass_12345678"
+        )
+
+        // 1回目のリクエストは成功する
+        mockMvc.perform(
+            post("/app_user/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request1))
+        ).andExpect(status().isOk)
+
+        // 同じユーザーだと409
+        val resultAction = mockMvc.perform(
+            post("/app_user/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request2))
+        ).andExpect(status().isConflict)
+        val responseBody = createResponseBodyJson(resultAction)
+        assertEquals(responseBody.getString("errorCode"), ErrorCode.E0004.code)
+        assertEquals(responseBody.getString("message"), ErrorCode.E0004.message)
     }
 }
