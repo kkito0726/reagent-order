@@ -3,7 +3,7 @@ package kkito.reagent_order.app_user
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.app_user.value.AppUserRequest
-import org.jooq.DSLContext
+import org.assertj.db.api.Assertions
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,8 +24,12 @@ import kotlin.test.assertNotNull
 class AppUserTest(
     @Autowired private val mockMvc: MockMvc,
     @Autowired private val objectMapper: ObjectMapper,
-    @Autowired dslContext: DSLContext
-) : TestSupport(dslContext) {
+) : TestSupport() {
+
+    companion object {
+        private val TABLE_NAMES = listOf("app_user")
+    }
+
     @BeforeEach
     override fun setUp() {
         super.setUp()
@@ -38,11 +42,14 @@ class AppUserTest(
             "test_email@test.gmail.com",
             "Test_pass_12345678"
         )
+        val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultAction = mockMvc.perform(
             post("/app_user/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andExpect(status().isOk)
+        changes.setEndPointNow()
 
+        // レスポンスのアサート
         val responseBody = JSONObject(resultAction.andReturn().response.contentAsString)
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
@@ -54,5 +61,23 @@ class AppUserTest(
             )
         )
         assertEquals(responseBody.getString("deletedAt"), "null")
+
+        // DBアサート
+        Assertions.assertThat(changes)
+            .ofModificationOnTable("app_user")
+            .hasNumberOfChanges(0)
+            .ofDeletionOnTable("app_user")
+            .hasNumberOfChanges(0)
+            .ofCreationOnTable("app_user")
+            .hasNumberOfChanges(1)
+            .change()
+            .isCreation()
+            .rowAtEndPoint()
+            .value("id").isNotNull()
+            .value("app_user_name").isEqualTo(request.appUserName)
+            .value("email").isEqualTo(request.email)
+            .value("password").isEqualTo(request.password)
+            .value("created_at").isNotNull()
+            .value("deleted_at").isNull()
     }
 }
