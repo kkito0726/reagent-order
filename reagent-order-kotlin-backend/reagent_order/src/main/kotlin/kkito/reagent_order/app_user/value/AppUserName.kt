@@ -4,7 +4,7 @@ import kkito.reagent_order.error.BusinessLogicException
 import kkito.reagent_order.error.ErrorCode
 import org.springframework.http.HttpStatus
 
-class AppUserName private constructor(val value: String) {
+data class AppUserName(val value: String) {
     init {
         if (value.length !in 3..15) {
             throw BusinessLogicException(HttpStatus.BAD_REQUEST, ErrorCode.E0001)

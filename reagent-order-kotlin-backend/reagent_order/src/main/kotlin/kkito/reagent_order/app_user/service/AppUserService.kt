@@ -4,18 +4,25 @@ import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.value.AppUserResponse
 import kkito.reagent_order.app_user.repository.AppUserRepository
 import kkito.reagent_order.app_user.service.spec.AppUserCreateSpec
+import kkito.reagent_order.app_user.service.spec.AppUserUpdateSpec
+import kkito.reagent_order.app_user.value.AppUserDto
+import kkito.reagent_order.app_user.value.AppUserId
+import kkito.reagent_order.error.ErrorCode
+import kkito.reagent_order.error.NotFoundException
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
 open class AppUserService(
     private val appUserCreateSpec: AppUserCreateSpec,
+    private val appUserUpdateSpec: AppUserUpdateSpec,
     private val appUserRepository: AppUserRepository
 ) {
     fun createAppUser(appUserEntity: AppUserEntity): AppUserResponse {
-        // TODO: アプリユーザが重複していないかの確認
+        // アプリユーザが重複していないかの確認
         appUserCreateSpec.check(appUserEntity)
 
-        // TODO: 永続化
+        // 永続化
         appUserRepository.createAppUser(appUserEntity)
         return AppUserResponse(
             appUserEntity.id.toString(),
@@ -25,5 +32,31 @@ open class AppUserService(
             appUserEntity.createdAt,
             appUserEntity.deletedAt
         )
+    }
+
+    fun updateAppUser(newAppUserDto: AppUserDto): AppUserResponse {
+        val oldAppUserEntity = appUserRepository.getAppUser(newAppUserDto.id)
+            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+
+        // 更新内容が重複してないか確認
+        appUserUpdateSpec.check(oldAppUserEntity, newAppUserDto)
+
+        // 永続化
+        appUserRepository.updateAppUser(newAppUserDto)
+        return AppUserResponse(
+            newAppUserDto.id.toString(),
+            newAppUserDto.appUserName.value,
+            newAppUserDto.email.value,
+            newAppUserDto.password.value,
+            null
+        )
+    }
+
+    fun deleteAppUser(appUserId: AppUserId) {
+        if (appUserRepository.getAppUser(appUserId) == null) {
+            throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+        }
+
+        appUserRepository.deleteAppUser(appUserId)
     }
 }

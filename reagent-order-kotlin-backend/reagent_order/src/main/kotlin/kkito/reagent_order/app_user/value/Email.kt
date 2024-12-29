@@ -4,7 +4,7 @@ import kkito.reagent_order.error.BusinessLogicException
 import kkito.reagent_order.error.ErrorCode
 import org.springframework.http.HttpStatus
 
-class Email private constructor(val value: String) {
+data class Email(val value: String) {
     init {
         val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
         if (!emailRegex.matches(value)) {
