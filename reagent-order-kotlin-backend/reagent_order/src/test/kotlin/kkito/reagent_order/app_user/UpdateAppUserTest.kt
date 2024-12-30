@@ -144,7 +144,7 @@ class UpdateAppUserTest(
     @Test
     fun 更新するユーザーが見つからない場合_E0006エラーになる() {
         testDataAppUser.createAppUser()
-        val resisterUser = createResponseBodyJson(
+        createResponseBodyJson(
             testDataAppUser.createAppUser(
                 appUserName = "テスト 太郎2",
                 email = "second_user@test.gmail.com"

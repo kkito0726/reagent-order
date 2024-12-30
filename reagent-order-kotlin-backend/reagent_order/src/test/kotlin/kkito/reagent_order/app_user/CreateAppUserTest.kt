@@ -23,7 +23,7 @@ import kotlin.test.assertNotNull
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class AppUserTest(
+class CreateAppUserTest(
     @Autowired private val mockMvc: MockMvc,
     @Autowired private val objectMapper: ObjectMapper,
 ) : TestSupport() {
