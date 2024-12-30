@@ -42,6 +42,6 @@ class AppUserController(private val appUserService: AppUserService) {
 
     @DeleteMapping("app_user/{id}")
     fun deleteAppUser(@PathVariable id: UUID): ResponseEntity<Any> {
-        return ResponseEntity.ok(appUserService.deleteAppUser(AppUserId.of(id)))
+        return ResponseEntity.ok(appUserService.deleteAppUser(AppUserId(id)))
     }
 }
