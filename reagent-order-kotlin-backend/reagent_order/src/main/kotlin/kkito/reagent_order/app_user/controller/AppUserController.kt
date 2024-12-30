@@ -18,9 +18,9 @@ class AppUserController(private val appUserService: AppUserService) {
     @PostMapping("/app_user/create")
     fun createAppUser(@RequestBody appUserRequest: AppUserRequest): ResponseEntity<AppUserResponse> {
         val appUser = AppUserEntity(
-            AppUserId.of(UUID.randomUUID()),
-            AppUserName.of(appUserRequest.appUserName),
-            Email.of(appUserRequest.email),
+            AppUserId(UUID.randomUUID()),
+            AppUserName(appUserRequest.appUserName),
+            Email(appUserRequest.email),
             Password(appUserRequest.password),
             LocalDateTime.now(),
             null
@@ -33,8 +33,8 @@ class AppUserController(private val appUserService: AppUserService) {
     fun updateAppUser(@PathVariable id: UUID, @RequestBody appUserRequest: AppUserRequest): ResponseEntity<AppUserResponse> {
         val newAppUserDto = AppUserDto(
             AppUserId(id),
-            AppUserName.of(appUserRequest.appUserName),
-            Email.of(appUserRequest.email),
+            AppUserName(appUserRequest.appUserName),
+            Email(appUserRequest.email),
             Password(appUserRequest.password),
         )
         return ResponseEntity.ok(appUserService.updateAppUser(newAppUserDto))

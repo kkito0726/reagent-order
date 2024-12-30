@@ -11,12 +11,6 @@ data class AppUserName(val value: String) {
         }
     }
 
-    companion object {
-        fun of(value: String): AppUserName {
-            return AppUserName(value)
-        }
-    }
-
     override fun toString(): String {
         return value
     }
