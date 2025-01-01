@@ -34,6 +34,11 @@ open class AppUserService(
         )
     }
 
+    fun getAppUser(appUserId: AppUserId): AppUserEntity {
+        return appUserRepository.getAppUser(appUserId)
+            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+    }
+
     fun updateAppUser(newAppUserDto: AppUserDto): AppUserResponse {
         val oldAppUserEntity = appUserRepository.getAppUser(newAppUserDto.id)
             ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
