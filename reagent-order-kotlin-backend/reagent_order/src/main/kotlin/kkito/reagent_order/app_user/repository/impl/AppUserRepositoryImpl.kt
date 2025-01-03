@@ -42,7 +42,7 @@ open class AppUserRepositoryImpl(
         return dslContext.update(APP_USER)
             .set(APP_USER.APP_USER_NAME, newAppUserDto.appUserName.value)
             .set(APP_USER.EMAIL, newAppUserDto.email.value)
-            .set(APP_USER.PASSWORD, newAppUserDto.password.value)
+            .set(APP_USER.PASSWORD, passwordEncoder.encode(newAppUserDto.password.value))
             .where(APP_USER.ID.eq(newAppUserDto.id.toString())).execute()
     }
 

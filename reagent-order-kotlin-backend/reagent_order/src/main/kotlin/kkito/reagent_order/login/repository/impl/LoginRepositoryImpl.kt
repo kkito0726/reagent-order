@@ -26,6 +26,7 @@ open class LoginRepositoryImpl(
     override fun getAppUserByEmail(email: Email): AppUserEntity {
         return dslContext.selectFrom(APP_USER)
             .where(APP_USER.EMAIL.eq(email.value))
+            .and(APP_USER.DELETED_AT.isNull)
             .fetchOneInto(AppUserEntity::class.java)
             ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
     }

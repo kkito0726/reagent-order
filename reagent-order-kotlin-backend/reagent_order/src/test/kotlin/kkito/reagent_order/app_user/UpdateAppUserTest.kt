@@ -75,7 +75,6 @@ class UpdateAppUserTest(
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
         assertEquals(responseBody.getString("email"), request.email)
-        assertEquals(responseBody.getString("password"), request.password)
         assertEquals(responseBody.getString("deletedAt"), "null")
 
         Assertions.assertThat(changes)
@@ -90,9 +89,38 @@ class UpdateAppUserTest(
             .value("id").isNotNull()
             .value("app_user_name").isEqualTo(request.appUserName)
             .value("email").isEqualTo(request.email)
-            .value("password").isEqualTo(request.password)
+            .value("password").isNotNull
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()
+    }
+
+    @Test
+    fun パスワード変更後_新しいパスワードでログインできる() {
+        val newPassword = "New_password_87654321"
+        val request = AppUserRequest(
+            "テスト 太郎",
+            "test_email@test.gmail.com",
+            newPassword
+        )
+
+        val changes = createChanges(TABLE_NAMES).setStartPointNow()
+        val resultActions = mockMvc.perform(
+            put("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer $jwtToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isOk)
+        changes.setEndPointNow()
+        // レスポンスのアサート
+        val responseBody = createResponseBodyJson(resultActions)
+        assertNotNull(responseBody.getString("id"))
+        assertEquals(responseBody.getString("appUserName"), request.appUserName)
+        assertEquals(responseBody.getString("email"), request.email)
+        assertEquals(responseBody.getString("password"), request.password)
+        assertEquals(responseBody.getString("deletedAt"), "null")
+
+        val newJwt = testDataAppUser.login(password = newPassword)
+        assertNotNull(newJwt)
     }
 
     @Test

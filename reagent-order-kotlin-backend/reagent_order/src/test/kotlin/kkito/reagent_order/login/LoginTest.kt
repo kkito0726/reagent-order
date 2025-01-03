@@ -2,6 +2,7 @@ package kkito.reagent_order.login
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
+import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.login.value.LoginRequest
 import kkito.reagent_order.test_data.TestDataAppUser
 import org.junit.jupiter.api.BeforeEach
@@ -46,5 +47,23 @@ class LoginTest(
         assertNotNull(
             responseBody.getString("loginId")
         )
+    }
+
+    @Test
+    fun パスワードが間違っている場合_ログインできない_E0008エラーになる() {
+        val resisterUser = createResponseBodyJson(testDataAppUser.createAppUser())
+        val request = LoginRequest(
+            resisterUser.getString("email"),
+            "Bad_Password"
+        )
+
+        val resultActions = mockMvc.perform(
+            post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isForbidden)
+        val responseBody = createResponseBodyJson(resultActions)
+
+        assertEquals(ErrorCode.E0008.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0008.message, responseBody.getString("message"))
     }
 }
