@@ -7,6 +7,7 @@ import kkito.reagent_order.app_user.service.AppUserService
 import kkito.reagent_order.error.BusinessLogicException
 import kkito.reagent_order.error.ErrorCode
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -22,12 +23,16 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        if (request.requestURI == "/app_user/create" || request.requestURI == "/api/auth/login") {
+            filterChain.doFilter(request, response) // スキップ
+            return
+        }
         val token = extractToken(request)
         val appUserId = jwtUtil.extractAppUserId(token)
         val appUserEntity = appUserService.getAppUser(appUserId)
 
         // ユーザー情報を基に認証オブジェクトを作成
-        val authentication = CustomAuthenticationToken(appUserEntity, null, appUserEntity.authorities)
+        val authentication = UsernamePasswordAuthenticationToken(appUserEntity, null, appUserEntity.authorities)
         SecurityContextHolder.getContext().authentication = authentication
 
         filterChain.doFilter(request, response)

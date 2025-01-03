@@ -11,4 +11,5 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.jooq.tools.LoggerListener: DEBUG
+    io.jsonwebtoken: DEBUG
 

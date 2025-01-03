@@ -6,11 +6,15 @@ import kkito.reagent_order.app_user.repository.AppUserRepository
 import kkito.reagent_order.app_user.value.AppUserDto
 import kkito.reagent_order.app_user.value.AppUserId
 import org.jooq.DSLContext
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-open class AppUserRepositoryImpl(private val dslContext: DSLContext) : AppUserRepository {
+open class AppUserRepositoryImpl(
+    private val dslContext: DSLContext,
+    private val passwordEncoder: PasswordEncoder
+) : AppUserRepository {
     override fun createAppUser(appUserEntity: AppUserEntity) {
         dslContext.insertInto(APP_USER).columns(
             APP_USER.ID,
@@ -23,7 +27,7 @@ open class AppUserRepositoryImpl(private val dslContext: DSLContext) : AppUserRe
             appUserEntity.id.appUserId.toString(),
             appUserEntity.appUserName.value,
             appUserEntity.email.value,
-            appUserEntity.password.value,
+            passwordEncoder.encode(appUserEntity.password.value),
             appUserEntity.createdAt,
             appUserEntity.deletedAt
         ).execute()

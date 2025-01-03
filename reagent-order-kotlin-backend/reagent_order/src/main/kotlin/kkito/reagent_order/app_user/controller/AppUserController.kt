@@ -4,6 +4,7 @@ import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.service.AppUserService
 import kkito.reagent_order.app_user.value.*
 import org.springframework.http.ResponseEntity
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,7 +15,9 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Controller
-class AppUserController(private val appUserService: AppUserService) {
+class AppUserController(
+    private val appUserService: AppUserService,
+) {
     @PostMapping("/app_user/create")
     fun createAppUser(@RequestBody appUserRequest: AppUserRequest): ResponseEntity<AppUserResponse> {
         val appUser = AppUserEntity(
@@ -30,7 +33,10 @@ class AppUserController(private val appUserService: AppUserService) {
     }
 
     @PutMapping("app_user/{id}")
-    fun updateAppUser(@PathVariable id: UUID, @RequestBody appUserRequest: AppUserRequest): ResponseEntity<AppUserResponse> {
+    fun updateAppUser(
+        @PathVariable id: UUID,
+        @RequestBody appUserRequest: AppUserRequest
+    ): ResponseEntity<AppUserResponse> {
         val newAppUserDto = AppUserDto(
             AppUserId(id),
             AppUserName(appUserRequest.appUserName),

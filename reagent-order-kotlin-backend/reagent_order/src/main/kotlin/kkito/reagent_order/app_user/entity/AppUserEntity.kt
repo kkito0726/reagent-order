@@ -15,12 +15,12 @@ data class AppUserEntity(
     val password: Password,
     val createdAt: LocalDateTime,
     var deletedAt: LocalDateTime? = null,
-    private val authorities: List<GrantedAuthority> = listOf()
+//    private val authorities: List<GrantedAuthority> = listOf()
 ) : UserDetails {
-    override fun getAuthorities(): List<GrantedAuthority> = authorities
+    override fun getAuthorities(): List<GrantedAuthority> = listOf(GrantedAuthority { "USER" })
 
     override fun getPassword(): String = password.value
 
-    override fun getUsername(): String = appUserName.value
+    override fun getUsername(): String = email.value
 
 }

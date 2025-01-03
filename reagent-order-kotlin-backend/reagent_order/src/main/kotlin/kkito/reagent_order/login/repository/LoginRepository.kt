@@ -6,4 +6,5 @@ import kkito.reagent_order.app_user.value.Password
 
 interface LoginRepository {
     fun getAppUser(email: Email, password: Password): AppUserEntity
+    fun getAppUserByEmail(email: Email): AppUserEntity
 }

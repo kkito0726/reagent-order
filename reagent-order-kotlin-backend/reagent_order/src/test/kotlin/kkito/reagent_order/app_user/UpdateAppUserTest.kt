@@ -6,6 +6,7 @@ import kkito.reagent_order.app_user.value.AppUserRequest
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.test_data.TestDataAppUser
 import org.assertj.db.api.Assertions
+import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -32,9 +33,14 @@ class UpdateAppUserTest(
         private val TABLE_NAMES = listOf("app_user")
     }
 
+    private lateinit var createdUserResponse: JSONObject
+    private lateinit var jwtToken: String
+
     @BeforeEach
     override fun setUp() {
         super.setUp()
+        createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
+        jwtToken = testDataAppUser.login()
     }
 
     @ParameterizedTest
@@ -50,7 +56,6 @@ class UpdateAppUserTest(
         email: String,
         password: String
     ) {
-        val resisterUser = createResponseBodyJson(testDataAppUser.createAppUser())
         val request = AppUserRequest(
             userName,
             email,
@@ -59,7 +64,8 @@ class UpdateAppUserTest(
 
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultActions = mockMvc.perform(
-            put("/app_user/${resisterUser.getString("id")}")
+            put("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andExpect(status().isOk)
@@ -91,21 +97,21 @@ class UpdateAppUserTest(
 
     @Test
     fun 変更しようとしたユーザ名が重複した場合_E0004エラーになる() {
-        testDataAppUser.createAppUser()
-        val resisterUser = createResponseBodyJson(
+        createResponseBodyJson(
             testDataAppUser.createAppUser(
                 appUserName = "テスト 太郎2",
                 email = "second_user@test.gmail.com"
             )
         )
         val request = AppUserRequest(
-            "テスト 太郎",
-            "second_user@test.gmail.com",
+            "テスト 太郎2",
+            "test_email@test.gmail.com",
             "Test_pass_12345678"
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${resisterUser.getString("id")}")
+            put("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andExpect(status().isConflict)
@@ -117,8 +123,7 @@ class UpdateAppUserTest(
 
     @Test
     fun 変更しようとしたメールアドレスが重複する場合_E0005エラーになる() {
-        testDataAppUser.createAppUser()
-        val resisterUser = createResponseBodyJson(
+        createResponseBodyJson(
             testDataAppUser.createAppUser(
                 appUserName = "テスト 太郎2",
                 email = "second_user@test.gmail.com"
@@ -126,12 +131,13 @@ class UpdateAppUserTest(
         )
         val request = AppUserRequest(
             "てすと 太郎",
-            "test_email@test.gmail.com",
+            "second_user@test.gmail.com",
             "Test_pass_12345678"
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${resisterUser.getString("id")}")
+            put("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andExpect(status().isConflict)
@@ -143,7 +149,6 @@ class UpdateAppUserTest(
 
     @Test
     fun 更新するユーザーが見つからない場合_E0006エラーになる() {
-        testDataAppUser.createAppUser()
         createResponseBodyJson(
             testDataAppUser.createAppUser(
                 appUserName = "テスト 太郎2",
@@ -158,6 +163,7 @@ class UpdateAppUserTest(
 
         val resultActions = mockMvc.perform(
             put("/app_user/${UUID.randomUUID()}")
+                .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         ).andExpect(status().isNotFound)
