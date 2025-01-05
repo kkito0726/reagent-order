@@ -4,6 +4,7 @@ import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.value.AppUserResponse
 import kkito.reagent_order.app_user.repository.AppUserRepository
 import kkito.reagent_order.app_user.service.spec.AppUserCreateSpec
+import kkito.reagent_order.app_user.service.spec.AppUserDeleteSpec
 import kkito.reagent_order.app_user.service.spec.AppUserUpdateSpec
 import kkito.reagent_order.app_user.value.AppUserDto
 import kkito.reagent_order.app_user.value.AppUserId
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service
 open class AppUserService(
     private val appUserCreateSpec: AppUserCreateSpec,
     private val appUserUpdateSpec: AppUserUpdateSpec,
+    private val appUserDeleteSpec: AppUserDeleteSpec,
     private val appUserRepository: AppUserRepository
 ) {
     fun createAppUser(appUserEntity: AppUserEntity): AppUserResponse {
@@ -39,12 +41,12 @@ open class AppUserService(
             ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
     }
 
-    fun updateAppUser(newAppUserDto: AppUserDto): AppUserResponse {
-        val oldAppUserEntity = appUserRepository.getAppUser(newAppUserDto.id)
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
-
-        // 更新内容が重複してないか確認
-        appUserUpdateSpec.check(oldAppUserEntity, newAppUserDto)
+    fun updateAppUser(
+        newAppUserDto: AppUserDto,
+        authAppUserEntity: AppUserEntity
+    ): AppUserResponse {
+        // 更新権限と更新内容が重複してないか確認
+        appUserUpdateSpec.check(newAppUserDto, authAppUserEntity)
 
         // 永続化
         appUserRepository.updateAppUser(newAppUserDto)
@@ -57,11 +59,8 @@ open class AppUserService(
         )
     }
 
-    fun deleteAppUser(appUserId: AppUserId) {
-        if (appUserRepository.getAppUser(appUserId) == null) {
-            throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
-        }
-
+    fun deleteAppUser(appUserId: AppUserId, authAppUserEntity: AppUserEntity) {
+        appUserDeleteSpec.check(appUserId, authAppUserEntity)
         appUserRepository.deleteAppUser(appUserId)
     }
 }

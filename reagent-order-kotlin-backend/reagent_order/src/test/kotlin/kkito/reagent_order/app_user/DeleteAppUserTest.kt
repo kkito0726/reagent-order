@@ -21,7 +21,6 @@ import kotlin.test.assertEquals
 @AutoConfigureMockMvc
 class DeleteAppUserTest(
     @Autowired private val mockMvc: MockMvc,
-    @Autowired private val objectMapper: ObjectMapper,
     @Autowired private val testDataAppUser: TestDataAppUser,
 ) : TestSupport() {
     companion object {
@@ -39,7 +38,7 @@ class DeleteAppUserTest(
     }
 
     @Test
-    fun ユーザーを削除できる() {
+    fun ユーザーを退会処理できる() {
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultActions = mockMvc.perform(
             delete("/app_user/${createdUserResponse.getString("id")}")
@@ -70,13 +69,27 @@ class DeleteAppUserTest(
     }
 
     @Test
-    fun 削除対象のユーザーが見つからない場合_E0006エラーになる() {
+    fun ログインユーザーのIDとパスパラメータのIDが異なる場合_E0009認証エラーになる() {
         val resultActions = mockMvc.perform(
             delete("/app_user/${UUID.randomUUID()}")
                 .header("Authorization", "Bearer $jwtToken")
-        ).andExpect(status().isNotFound())
+        ).andExpect(status().isForbidden())
         val responseBody = createResponseBodyJson(resultActions)
 
+        assertEquals(ErrorCode.E0009.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0009.message, responseBody.getString("message"))
+    }
+
+    @Test
+    fun 削除対象のユーザが削除済の場合() {
+        testDataAppUser.deleteAppUser(createdUserResponse.getString("id"), jwtToken)
+
+        val resultActions = mockMvc.perform(
+            delete("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(status().isNotFound)
+
+        val responseBody = createResponseBodyJson(resultActions)
         assertEquals(ErrorCode.E0006.code, responseBody.getString("errorCode"))
         assertEquals(ErrorCode.E0006.message, responseBody.getString("message"))
     }

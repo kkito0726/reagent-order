@@ -176,7 +176,7 @@ class UpdateAppUserTest(
     }
 
     @Test
-    fun 更新するユーザーが見つからない場合_E0006エラーになる() {
+    fun ログインユーザーとパスパラメータのIDが異なる場合_E0009認証エラーになる() {
         createResponseBodyJson(
             testDataAppUser.createAppUser(
                 appUserName = "テスト 太郎2",
@@ -194,11 +194,11 @@ class UpdateAppUserTest(
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
-        ).andExpect(status().isNotFound)
+        ).andExpect(status().isForbidden)
         // レスポンスのアサート
         val responseBody = createResponseBodyJson(resultActions)
-        assertEquals(ErrorCode.E0006.code, responseBody.getString("errorCode"))
-        assertEquals(ErrorCode.E0006.message, responseBody.getString("message"))
+        assertEquals(ErrorCode.E0009.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0009.message, responseBody.getString("message"))
     }
 
     @Test
