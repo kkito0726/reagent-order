@@ -1,6 +1,5 @@
 package kkito.reagent_order.app_user
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.test_data.TestDataAppUser
@@ -41,8 +40,10 @@ class DeleteAppUserTest(
     fun ユーザーを退会処理できる() {
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultActions = mockMvc.perform(
-            delete("/app_user/${createdUserResponse.getString("id")}")
-                .header("Authorization", "Bearer $jwtToken")
+            delete("/app_user/${createdUserResponse.getString("id")}").header(
+                    "Authorization",
+                    "Bearer $jwtToken"
+                )
         ).andExpect(status().isOk())
         changes.setEndPointNow()
 
@@ -51,28 +52,20 @@ class DeleteAppUserTest(
         assertEquals("{}", responseBody.toString())
 
         // DBアサーション
-        Assertions.assertThat(changes)
-            .ofModificationOnTable("app_user")
-            .hasNumberOfChanges(1)
-            .ofDeletionOnTable("app_user")
-            .hasNumberOfChanges(0)
-            .ofCreationOnTable("app_user")
-            .hasNumberOfChanges(0)
-            .changeOfModification()
-            .rowAtEndPoint()
-            .value("id").isEqualTo(createdUserResponse.getString("id"))
-            .value("app_user_name").isEqualTo(createdUserResponse.getString("appUserName"))
-            .value("email").isEqualTo(createdUserResponse.getString("email"))
+        Assertions.assertThat(changes).ofModificationOnTable("app_user").hasNumberOfChanges(1)
+            .ofDeletionOnTable("app_user").hasNumberOfChanges(0).ofCreationOnTable("app_user")
+            .hasNumberOfChanges(0).changeOfModification().rowAtEndPoint().value("id")
+            .isEqualTo(createdUserResponse.getString("id")).value("app_user_name")
+            .isEqualTo(createdUserResponse.getString("appUserName")).value("email")
+            .isEqualTo(createdUserResponse.getString("email"))
 //            .value("password").isEqualTo(createdUserResponse.getString("password"))
-            .value("created_at").isNotNull()
-            .value("deleted_at").isNotNull()
+            .value("created_at").isNotNull().value("deleted_at").isNotNull()
     }
 
     @Test
     fun ログインユーザーのIDとパスパラメータのIDが異なる場合_E0009認証エラーになる() {
         val resultActions = mockMvc.perform(
-            delete("/app_user/${UUID.randomUUID()}")
-                .header("Authorization", "Bearer $jwtToken")
+            delete("/app_user/${UUID.randomUUID()}").header("Authorization", "Bearer $jwtToken")
         ).andExpect(status().isForbidden())
         val responseBody = createResponseBodyJson(resultActions)
 
@@ -85,8 +78,10 @@ class DeleteAppUserTest(
         testDataAppUser.deleteAppUser(createdUserResponse.getString("id"), jwtToken)
 
         val resultActions = mockMvc.perform(
-            delete("/app_user/${createdUserResponse.getString("id")}")
-                .header("Authorization", "Bearer $jwtToken")
+            delete("/app_user/${createdUserResponse.getString("id")}").header(
+                    "Authorization",
+                    "Bearer $jwtToken"
+                )
         ).andExpect(status().isNotFound)
 
         val responseBody = createResponseBodyJson(resultActions)

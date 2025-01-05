@@ -1,5 +1,6 @@
 package kkito.reagent_order.login.service
 
+import kkito.reagent_order.app_user.value.AppUserResponse
 import kkito.reagent_order.app_user.value.Email
 import kkito.reagent_order.app_user.value.Password
 import kkito.reagent_order.error.ErrorCode
@@ -25,7 +26,12 @@ class LoginService(
             throw ForbiddenException(HttpStatus.FORBIDDEN, ErrorCode.E0008)
         }
         return LoginResponse(
-            appUserEntity,
+            AppUserResponse(
+                appUserEntity.id.toString(),
+                appUserEntity.appUserName.value,
+                appUserEntity.email.value,
+                appUserEntity.createdAt
+            ),
             jwtUtil.generateToken(appUserEntity.id)
         )
     }

@@ -75,7 +75,6 @@ class UpdateAppUserTest(
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
         assertEquals(responseBody.getString("email"), request.email)
-        assertEquals(responseBody.getString("deletedAt"), "null")
 
         Assertions.assertThat(changes)
             .ofModificationOnTable("app_user")
@@ -116,8 +115,6 @@ class UpdateAppUserTest(
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
         assertEquals(responseBody.getString("email"), request.email)
-        assertEquals(responseBody.getString("password"), request.password)
-        assertEquals(responseBody.getString("deletedAt"), "null")
 
         val newJwt = testDataAppUser.login(password = newPassword)
         assertNotNull(newJwt)
@@ -225,7 +222,7 @@ class UpdateAppUserTest(
 
 
     @Test
-    fun jwtTokenの形式が不正な場合() {
+    fun JWTの形式が不正な場合() {
         val request = AppUserRequest(
             "てすと 太郎",
             "second_user@test.gmail.com",

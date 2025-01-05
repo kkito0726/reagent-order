@@ -65,7 +65,6 @@ class CreateAppUserTest(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")
             )
         )
-        assertEquals(responseBody.getString("deletedAt"), "null")
 
         // DBアサート
         Assertions.assertThat(changes)
