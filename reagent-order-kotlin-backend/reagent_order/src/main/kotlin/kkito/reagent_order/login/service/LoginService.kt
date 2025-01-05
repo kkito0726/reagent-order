@@ -28,7 +28,6 @@ class LoginService(
             appUserEntity,
             jwtUtil.generateToken(appUserEntity.id)
         )
-
     }
 
     override fun loadUserByUsername(email: String): UserDetails{

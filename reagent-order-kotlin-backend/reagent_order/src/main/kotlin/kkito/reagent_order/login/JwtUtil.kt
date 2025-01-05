@@ -62,7 +62,7 @@ class JwtUtil {
                 .body
             AppUserId(UUID.fromString(claims.subject.toString()))
         } catch (e: Exception) {
-            throw BusinessLogicException(HttpStatus.BAD_REQUEST, ErrorCode.E0007)
+            throw BusinessLogicException(HttpStatus.BAD_REQUEST, ErrorCode.E0010)
         }
     }
 }

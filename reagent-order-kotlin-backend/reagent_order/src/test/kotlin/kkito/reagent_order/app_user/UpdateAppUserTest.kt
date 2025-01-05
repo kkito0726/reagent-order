@@ -200,4 +200,47 @@ class UpdateAppUserTest(
         assertEquals(ErrorCode.E0006.code, responseBody.getString("errorCode"))
         assertEquals(ErrorCode.E0006.message, responseBody.getString("message"))
     }
+
+    @Test
+    fun 退会済みのユーザーを更新しようとする場合_E0006エラーになる() {
+        testDataAppUser.deleteAppUser(createdUserResponse.getString("id"), jwtToken)
+
+        val request = AppUserRequest(
+            "てすと 太郎",
+            "second_user@test.gmail.com",
+            "Test_pass_12345678"
+        )
+
+        val resultActions = mockMvc.perform(
+            put("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer $jwtToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isNotFound)
+        // レスポンスのアサート
+        val responseBody = createResponseBodyJson(resultActions)
+        assertEquals(ErrorCode.E0006.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0006.message, responseBody.getString("message"))
+    }
+
+
+    @Test
+    fun jwtTokenの形式が不正な場合() {
+        val request = AppUserRequest(
+            "てすと 太郎",
+            "second_user@test.gmail.com",
+            "Test_pass_12345678"
+        )
+
+        val resultActions = mockMvc.perform(
+            put("/app_user/${createdUserResponse.getString("id")}")
+                .header("Authorization", "Bearer Invalid token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isBadRequest)
+        val responseBody = createResponseBodyJson(resultActions)
+
+        assertEquals(ErrorCode.E0010.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0010.message, responseBody.getString("message"))
+    }
 }

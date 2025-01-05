@@ -38,6 +38,13 @@ class TestDataAppUser {
         return resultActions
     }
 
+    fun deleteAppUser(appUserId: String, jwtToken: String) {
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/app_user/$appUserId")
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(MockMvcResultMatchers.status().isOk())
+    }
+
     fun login(
         email: String = "test_email@test.gmail.com",
         password: String = "Test_pass_12345678",

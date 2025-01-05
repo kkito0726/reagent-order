@@ -2,6 +2,7 @@ package kkito.reagent_order.login.repository.impl
 
 import com.generate.jooq.Tables.APP_USER
 import kkito.reagent_order.app_user.entity.AppUserEntity
+import kkito.reagent_order.app_user.value.AppUserId
 import kkito.reagent_order.app_user.value.Email
 import kkito.reagent_order.app_user.value.Password
 import kkito.reagent_order.error.ErrorCode
@@ -26,6 +27,14 @@ open class LoginRepositoryImpl(
     override fun getAppUserByEmail(email: Email): AppUserEntity {
         return dslContext.selectFrom(APP_USER)
             .where(APP_USER.EMAIL.eq(email.value))
+            .and(APP_USER.DELETED_AT.isNull)
+            .fetchOneInto(AppUserEntity::class.java)
+            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+    }
+
+    override fun getAppUserByAppUserId(appUserId: AppUserId): AppUserEntity {
+        return dslContext.selectFrom(APP_USER)
+            .where(APP_USER.ID.eq(appUserId.appUserId.toString()))
             .and(APP_USER.DELETED_AT.isNull)
             .fetchOneInto(AppUserEntity::class.java)
             ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)

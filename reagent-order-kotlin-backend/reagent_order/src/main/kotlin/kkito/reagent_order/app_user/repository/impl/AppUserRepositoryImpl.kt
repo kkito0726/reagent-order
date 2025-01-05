@@ -34,7 +34,9 @@ open class AppUserRepositoryImpl(
     }
 
     override fun getAppUser(appUserId: AppUserId): AppUserEntity? {
-        return dslContext.selectFrom(APP_USER).where(APP_USER.ID.eq(appUserId.toString()))
+        return dslContext.selectFrom(APP_USER)
+            .where(APP_USER.ID.eq(appUserId.toString()))
+            .and(APP_USER.DELETED_AT.isNull)
             .fetchOneInto(AppUserEntity::class.java)
     }
 
