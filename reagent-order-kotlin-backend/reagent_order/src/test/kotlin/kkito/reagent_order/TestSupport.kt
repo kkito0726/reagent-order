@@ -1,17 +1,22 @@
 package kkito.reagent_order
 
 import com.generate.jooq.Tables.APP_USER
+import kkito.reagent_order.config.SecurityConfig
 import org.assertj.db.type.Changes
 import org.assertj.db.type.Table
 import org.jooq.DSLContext
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.web.servlet.ResultActions
 import javax.sql.DataSource
 
 @SpringBootTest
+@AutoConfigureMockMvc
+@Import(SecurityConfig::class)
 open class TestSupport {
     @Autowired
     lateinit var dslContext: DSLContext

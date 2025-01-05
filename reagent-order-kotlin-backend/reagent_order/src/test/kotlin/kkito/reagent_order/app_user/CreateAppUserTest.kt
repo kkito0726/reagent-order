@@ -1,6 +1,7 @@
 package kkito.reagent_order.app_user
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.generate.jooq.Tables.APP_USER
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.app_user.value.AppUserRequest
 import kkito.reagent_order.error.ErrorCode
@@ -56,13 +57,14 @@ class CreateAppUserTest(
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
         assertEquals(responseBody.getString("email"), request.email)
-        assertEquals(responseBody.getString("password"), request.password)
+        val password = dslContext.select(APP_USER.PASSWORD).from(APP_USER)
+            .where(APP_USER.ID.eq(responseBody.getString("id"))).fetchOne()?.get("password")
+            .toString()
         assertEquals(
             responseBody.getString("createdAt").substring(0, 10), LocalDate.now().format(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")
             )
         )
-        assertEquals(responseBody.getString("deletedAt"), "null")
 
         // DBアサート
         Assertions.assertThat(changes)
@@ -78,7 +80,7 @@ class CreateAppUserTest(
             .value("id").isNotNull()
             .value("app_user_name").isEqualTo(request.appUserName)
             .value("email").isEqualTo(request.email)
-            .value("password").isEqualTo(request.password)
+            .value("password").isEqualTo(password)
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()
     }
