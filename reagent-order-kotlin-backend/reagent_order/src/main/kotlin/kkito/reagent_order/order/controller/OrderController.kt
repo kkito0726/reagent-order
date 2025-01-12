@@ -6,6 +6,7 @@ import kkito.reagent_order.order.value.*
 import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.util.*
@@ -28,5 +29,10 @@ class OrderController(private val orderService: OrderService): ControllerUtil() 
             }
         )
         return ResponseEntity.ok(orderService.postUserOrder(orderDto))
+    }
+
+    @GetMapping("/order")
+    fun getUserOrder(): ResponseEntity<List<UserOrderResponse>> {
+        return ResponseEntity.ok(orderService.getUserOrders())
     }
 }

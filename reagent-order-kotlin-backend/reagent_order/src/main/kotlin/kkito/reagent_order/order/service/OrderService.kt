@@ -27,4 +27,27 @@ class OrderService(private val orderRepository: OrderRepository) {
             }
         )
     }
+
+    fun getUserOrders(): List<UserOrderResponse> {
+        val orderEntities = orderRepository.getOrders()
+
+        return orderEntities.map { orderEntity ->
+            UserOrderResponse(
+                id = orderEntity.id,
+                title = orderEntity.title,
+                createdAt = orderEntity.createdAt,
+                orderDetails = orderEntity.orderDetailEntities.map {
+                    OrderDetailResponse(
+                        orderDetailId = it.id,
+                        reagentName = it.reagentName.value,
+                        url = it.url,
+                        count = it.count.value,
+                        status = it.status.value,
+                        createdAt = it.createdAt,
+                        updatedAt = it.updatedAt
+                    )
+                }
+            )
+        }
+    }
 }

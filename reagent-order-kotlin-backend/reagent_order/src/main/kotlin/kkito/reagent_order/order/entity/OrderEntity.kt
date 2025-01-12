@@ -1,13 +1,14 @@
 package kkito.reagent_order.order.entity
 
+import kkito.reagent_order.app_user.value.AppUserName
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
 @Table(name = "user_order")
-data class UserOrderEntity(
+data class OrderEntity(
     val id: Long,
-    val appUserId: String,
+    val appUserName: AppUserName,
     val title: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    val deletedAt: LocalDateTime? = null
+    val orderDetailEntities: List<OrderDetailEntity>
 )
