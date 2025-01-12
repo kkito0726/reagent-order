@@ -12,7 +12,7 @@ import java.util.*
 
 @Controller
 class OrderController(private val orderService: OrderService): ControllerUtil() {
-    @PostMapping("order")
+    @PostMapping("/order")
     fun postUserOrder(@RequestBody userOrderRequest: UserOrderRequest): ResponseEntity<UserOrderResponse> {
         val authAppUser = user()
         val orderDto = OrderDto(

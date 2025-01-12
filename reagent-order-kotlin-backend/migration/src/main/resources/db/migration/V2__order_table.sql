@@ -1,5 +1,5 @@
 CREATE TABLE user_order (
-  id BIGINT PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   app_user_id VARCHAR(50),
   title VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -8,7 +8,7 @@ CREATE TABLE user_order (
 );
 
 CREATE TABLE order_detail (
-  id BIGINT PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   reagent_name VARCHAR(50),
   url TEXT,
   count INT,
@@ -19,7 +19,7 @@ CREATE TABLE order_detail (
 );
 
 CREATE TABLE order_set (
-  id BIGINT PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   order_id BIGINT,
   order_detail_id BIGINT,
   FOREIGN KEY (order_id) REFERENCES user_order(id) ON DELETE CASCADE,

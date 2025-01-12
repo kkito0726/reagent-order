@@ -1,6 +1,9 @@
 package kkito.reagent_order
 
 import com.generate.jooq.Tables.APP_USER
+import com.generate.jooq.Tables.ORDER_DETAIL
+import com.generate.jooq.Tables.ORDER_SET
+import com.generate.jooq.Tables.USER_ORDER
 import kkito.reagent_order.config.SecurityConfig
 import org.assertj.db.type.Changes
 import org.assertj.db.type.Table
@@ -27,6 +30,9 @@ open class TestSupport {
     @BeforeEach
     open fun setUp() {
         dslContext.deleteFrom(APP_USER).execute()
+        dslContext.deleteFrom(ORDER_SET).execute()
+        dslContext.deleteFrom(ORDER_DETAIL).execute()
+        dslContext.deleteFrom(USER_ORDER).execute()
     }
 
     fun createChanges(tableNames: List<String>): Changes {
