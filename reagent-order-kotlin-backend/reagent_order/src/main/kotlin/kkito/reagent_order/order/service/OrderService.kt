@@ -1,6 +1,5 @@
-package kkito.reagent_order.order
+package kkito.reagent_order.order.service
 
-import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.OrderDetailResponse
 import kkito.reagent_order.order.value.OrderDto

@@ -1,7 +1,7 @@
 package kkito.reagent_order.order.controller
 
 import kkito.reagent_order.app_user.value.AppUserId
-import kkito.reagent_order.order.OrderService
+import kkito.reagent_order.order.service.OrderService
 import kkito.reagent_order.order.value.*
 import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
