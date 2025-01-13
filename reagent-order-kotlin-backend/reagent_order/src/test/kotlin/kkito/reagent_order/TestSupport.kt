@@ -8,6 +8,7 @@ import kkito.reagent_order.config.SecurityConfig
 import org.assertj.db.type.Changes
 import org.assertj.db.type.Table
 import org.jooq.DSLContext
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,7 +44,11 @@ open class TestSupport {
         )
     }
 
-    fun createResponseBodyJson(resultAction: ResultActions): JSONObject {
-        return JSONObject(resultAction.andReturn().response.contentAsByteArray.toString(Charsets.UTF_8))
+    fun createResponseBodyJson(resultActions: ResultActions): JSONObject {
+        return JSONObject(resultActions.andReturn().response.contentAsByteArray.toString(Charsets.UTF_8))
+    }
+
+    fun createResponseJsonArray(resultActions: ResultActions): JSONArray {
+        return JSONArray((resultActions.andReturn().response.contentAsByteArray.toString(Charsets.UTF_8)))
     }
 }

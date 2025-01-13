@@ -28,7 +28,7 @@ class OrderController(private val orderService: OrderService): ControllerUtil() 
                 )
             }
         )
-        return ResponseEntity.ok(orderService.postUserOrder(orderDto))
+        return ResponseEntity.ok(orderService.postUserOrder(orderDto, authAppUser))
     }
 
     @GetMapping("/order")

@@ -81,9 +81,10 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             .innerJoin(ORDER_SET).on(USER_ORDER.ID.eq(ORDER_SET.ORDER_ID))
             .innerJoin(ORDER_DETAIL).on(ORDER_SET.ORDER_DETAIL_ID.eq(ORDER_DETAIL.ID))
             .where(USER_ORDER.DELETED_AT.isNull, ORDER_DETAIL.DELETED_AT.isNull)
+            .orderBy(USER_ORDER.CREATED_AT)
 
         val group = record.groupBy { it["id"] as Long }
-        return group.map {(id, row) ->
+        return group.map { (id, row) ->
             val firstRow = row.first()
             OrderEntity(
                 id = id,

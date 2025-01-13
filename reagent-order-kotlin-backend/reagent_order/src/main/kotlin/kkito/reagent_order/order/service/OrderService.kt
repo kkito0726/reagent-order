@@ -1,5 +1,6 @@
 package kkito.reagent_order.order.service
 
+import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.OrderDetailResponse
 import kkito.reagent_order.order.value.OrderDto
@@ -8,10 +9,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class OrderService(private val orderRepository: OrderRepository) {
-    fun postUserOrder(userOrderDto: OrderDto): UserOrderResponse {
+    fun postUserOrder(userOrderDto: OrderDto, authAppUser: AppUserEntity): UserOrderResponse {
         val orderSetEntities = orderRepository.createOrder(userOrderDto)
         return UserOrderResponse(
             orderSetEntities[0].orderId,
+            authAppUser.appUserName.value,
             userOrderDto.title,
             userOrderDto.createdAt,
             orderSetEntities.mapIndexed() { i, it ->
@@ -34,6 +36,7 @@ class OrderService(private val orderRepository: OrderRepository) {
         return orderEntities.map { orderEntity ->
             UserOrderResponse(
                 id = orderEntity.id,
+                appUserName = orderEntity.appUserName.value,
                 title = orderEntity.title,
                 createdAt = orderEntity.createdAt,
                 orderDetails = orderEntity.orderDetailEntities.map {
