@@ -2,10 +2,7 @@ package kkito.reagent_order.order.service
 
 import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.order.repository.OrderRepository
-import kkito.reagent_order.order.value.OrderDetailResponse
-import kkito.reagent_order.order.value.OrderDto
-import kkito.reagent_order.order.value.UserOrderId
-import kkito.reagent_order.order.value.UserOrderResponse
+import kkito.reagent_order.order.value.*
 import org.springframework.stereotype.Service
 
 @Service
@@ -73,6 +70,19 @@ class OrderService(private val orderRepository: OrderRepository) {
                     updatedAt = it.updatedAt
                 )
             }
+        )
+    }
+
+    fun getOrderDetail(orderDetailId: OrderDetailId): OrderDetailResponse {
+        val orderDetailEntity = orderRepository.getOrderDetail(orderDetailId)
+        return OrderDetailResponse(
+            orderDetailId = orderDetailEntity.id.value,
+            reagentName = orderDetailEntity.reagentName.value,
+            url = orderDetailEntity.url,
+            count = orderDetailEntity.count.value,
+            status = orderDetailEntity.status.value,
+            createdAt = orderDetailEntity.createdAt,
+            updatedAt = orderDetailEntity.updatedAt,
         )
     }
 }

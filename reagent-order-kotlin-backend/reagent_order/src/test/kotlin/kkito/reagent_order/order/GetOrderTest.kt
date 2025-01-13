@@ -206,4 +206,63 @@ class GetOrderTest(
             assertEquals("null", orderDetail.getString("updatedAt"))
         }
     }
+
+    @Test
+    fun 申請詳細情報を取得できる() {
+        val requestOrders = listOf(
+            UserOrderRequest(
+                "テスト 試薬発注申請A",
+                listOf(
+                    OrderDetailRequest(
+                        "DMEM",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0104-2978.html",
+                        3
+                    ),
+                    OrderDetailRequest(
+                        "P/S",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0116-2319.html",
+                        2
+                    )
+                )
+            ),
+            UserOrderRequest(
+                "テスト 試薬発注申請B",
+                listOf(
+                    OrderDetailRequest(
+                        "コラゲナーゼ",
+                        "https://www.sigmaaldrich.com/JP/ja/product/sigma/c5138",
+                        1
+                    ),
+                    OrderDetailRequest(
+                        "DMEM",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0104-2978.html",
+                        2
+                    ),
+                    OrderDetailRequest(
+                        "P/S",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0116-2319.html",
+                        3
+                    )
+                )
+            )
+        )
+        testDataOrder.createOrder(requestOrders[0], jwtToken)
+        val createOrderResponse =
+            createResponseBodyJson(testDataOrder.createOrder(requestOrders[1], otherJwtToken))
+        val requestOrderDetail = createOrderResponse.getJSONArray("orderDetails").getJSONObject(0)
+        val resultActions = mockMvc.perform(
+            get(
+                "/order/orderDetail/${requestOrderDetail.getString("orderDetailId")}"
+            ).contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(status().isOk)
+        val responseBody = createResponseBodyJson(resultActions)
+        assertEquals(requestOrderDetail.getString("orderDetailId"), responseBody.getString("orderDetailId"))
+        assertEquals(requestOrderDetail.getString("reagentName"), responseBody.getString("reagentName"))
+        assertEquals(requestOrderDetail.getString("url"), responseBody.getString("url"))
+        assertEquals(requestOrderDetail.getString("count"), responseBody.getString("count"))
+        assertEquals(requestOrderDetail.getString("status"), responseBody.getString("status"))
+        assertNotNull(responseBody.getString("createdAt"))
+        assertEquals(requestOrderDetail.getString("updatedAt"), responseBody.getString("updatedAt"))
+    }
 }

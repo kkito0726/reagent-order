@@ -41,4 +41,9 @@ class OrderController(private val orderService: OrderService): ControllerUtil() 
     fun getUserOrder(@PathVariable orderId: Long): ResponseEntity<UserOrderResponse> {
         return ResponseEntity.ok(orderService.getUserOrder(UserOrderId(orderId)))
     }
+
+    @GetMapping("/order/orderDetail/{orderDetailId}")
+    fun getOrderDetail(@PathVariable orderDetailId: Long): ResponseEntity<OrderDetailResponse> {
+        return ResponseEntity.ok(orderService.getOrderDetail(OrderDetailId(orderDetailId)))
+    }
 }

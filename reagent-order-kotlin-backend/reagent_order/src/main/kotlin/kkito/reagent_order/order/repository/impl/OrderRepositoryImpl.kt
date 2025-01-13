@@ -7,6 +7,7 @@ import com.generate.jooq.Tables.USER_ORDER
 import kkito.reagent_order.app_user.value.AppUserName
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.error.InternalServerError
+import kkito.reagent_order.error.NotFoundException
 import kkito.reagent_order.order.entity.OrderDetailEntity
 import kkito.reagent_order.order.entity.OrderEntity
 import kkito.reagent_order.order.entity.OrderSetEntity
@@ -14,6 +15,7 @@ import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -113,5 +115,29 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
                 }
             )
         }
+    }
+
+    override fun getOrderDetail(orderDetailId: OrderDetailId): OrderDetailEntity {
+        val record = dslContext.select(
+            ORDER_DETAIL.ID,
+            ORDER_DETAIL.REAGENT_NAME,
+            ORDER_DETAIL.URL,
+            ORDER_DETAIL.COUNT,
+            ORDER_DETAIL.STATUS,
+            ORDER_DETAIL.CREATED_AT,
+            ORDER_DETAIL.UPDATED_AT
+        ).from(ORDER_DETAIL)
+            .where(ORDER_DETAIL.ID.eq(orderDetailId.value))
+            .fetchOne()
+            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0013)
+        return OrderDetailEntity(
+            id = OrderDetailId(record["id"] as Long),
+            reagentName = ReagentName(record["reagent_name"] as String),
+            url = record["url"] as String,
+            count = ReagentCount(record["count"] as Int),
+            status = OrderStatus.fromValue(record["status"] as String),
+            createdAt = record["created_at"] as LocalDateTime,
+            updatedAt = record["updated_at"] as LocalDateTime?
+        )
     }
 }
