@@ -36,13 +36,13 @@ class OrderService(private val orderRepository: OrderRepository) {
 
         return orderEntities.map { orderEntity ->
             UserOrderResponse(
-                id = orderEntity.id,
+                id = orderEntity.id.value,
                 appUserName = orderEntity.appUserName.value,
                 title = orderEntity.title,
                 createdAt = orderEntity.createdAt,
                 orderDetails = orderEntity.orderDetailEntities.map {
                     OrderDetailResponse(
-                        orderDetailId = it.id,
+                        orderDetailId = it.id.value,
                         reagentName = it.reagentName.value,
                         url = it.url,
                         count = it.count.value,
@@ -58,13 +58,13 @@ class OrderService(private val orderRepository: OrderRepository) {
     fun getUserOrder(orderId: UserOrderId): UserOrderResponse {
         val orderEntity = orderRepository.getOrders(orderId)[0]
         return UserOrderResponse(
-            id = orderEntity.id,
+            id = orderEntity.id.value,
             appUserName = orderEntity.appUserName.value,
             title = orderEntity.title,
             createdAt = orderEntity.createdAt,
             orderDetails = orderEntity.orderDetailEntities.map {
                 OrderDetailResponse(
-                    orderDetailId = it.id,
+                    orderDetailId = it.id.value,
                     reagentName = it.reagentName.value,
                     url = it.url,
                     count = it.count.value,

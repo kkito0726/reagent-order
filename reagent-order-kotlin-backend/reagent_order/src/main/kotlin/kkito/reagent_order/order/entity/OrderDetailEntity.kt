@@ -1,12 +1,13 @@
 package kkito.reagent_order.order.entity
 
+import kkito.reagent_order.order.value.OrderDetailId
 import kkito.reagent_order.order.value.OrderStatus
 import kkito.reagent_order.order.value.ReagentCount
 import kkito.reagent_order.order.value.ReagentName
 import java.time.LocalDateTime
 
 data class OrderDetailEntity(
-    val id: Long,
+    val id: OrderDetailId,
     val reagentName: ReagentName,
     val url: String?,
     val count: ReagentCount,

@@ -96,13 +96,13 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
         return group.map { (id, row) ->
             val firstRow = row.first()
             OrderEntity(
-                id = id,
+                id = UserOrderId(id),
                 appUserName = AppUserName(firstRow["appUserName"] as String),
                 title = firstRow["title"] as String,
                 createdAt = firstRow["createdAt"] as LocalDateTime,
                 orderDetailEntities = row.map {
                     OrderDetailEntity(
-                        id = it["orderDetailId"] as Long,
+                        id = OrderDetailId(it["orderDetailId"] as Long),
                         reagentName = ReagentName(it["reagentName"] as String),
                         url = it["url"] as String,
                         count = ReagentCount(it["count"] as Int),
