@@ -131,4 +131,79 @@ class GetOrderTest(
             }
         }
     }
+
+    @Test
+    fun 単一申請情報を取得できる() {
+        val requestOrders = listOf(
+            UserOrderRequest(
+                "テスト 試薬発注申請A",
+                listOf(
+                    OrderDetailRequest(
+                        "DMEM",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0104-2978.html",
+                        3
+                    ),
+                    OrderDetailRequest(
+                        "P/S",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0116-2319.html",
+                        2
+                    )
+                )
+            ),
+            UserOrderRequest(
+                "テスト 試薬発注申請B",
+                listOf(
+                    OrderDetailRequest(
+                        "コラゲナーゼ",
+                        "https://www.sigmaaldrich.com/JP/ja/product/sigma/c5138",
+                        1
+                    ),
+                    OrderDetailRequest(
+                        "DMEM",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0104-2978.html",
+                        2
+                    ),
+                    OrderDetailRequest(
+                        "P/S",
+                        "https://labchem-wako.fujifilm.com/jp/product/detail/W01W0116-2319.html",
+                        3
+                    )
+                )
+            )
+        )
+        testDataOrder.createOrder(requestOrders[0], jwtToken)
+        val createOrderResponse =
+            createResponseBodyJson(testDataOrder.createOrder(requestOrders[1], otherJwtToken))
+
+        val resultActions = mockMvc.perform(
+            get("/order/${createOrderResponse.getString("id")}").contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(status().isOk)
+        val responseBody = createResponseBodyJson(resultActions)
+        assertNotNull(responseBody.getString("id"))
+        assertEquals("サブユーザー", responseBody.getString("appUserName"))
+        assertEquals("テスト 試薬発注申請B", responseBody.getString("title"))
+        assertNotNull(responseBody.getString("createdAt"))
+        // 申請詳細のアサート
+        val orderDetails = responseBody.getJSONArray("orderDetails")
+        IntStream.range(0, orderDetails.length()).forEach { i ->
+            val orderDetail = orderDetails.getJSONObject(i)
+            assertNotNull(orderDetail.getString("orderDetailId"))
+            assertEquals(
+                requestOrders[1].orderDetails[i].reagentName,
+                orderDetail.getString("reagentName")
+            )
+            assertEquals(
+                requestOrders[1].orderDetails[i].url,
+                orderDetail.getString("url")
+            )
+            assertEquals(
+                requestOrders[1].orderDetails[i].count.toString(),
+                orderDetail.getString("count")
+            )
+            assertEquals(OrderStatus.PENDING.value, orderDetail.getString("status"))
+            assertNotNull(orderDetail.get("createdAt"))
+            assertEquals("null", orderDetail.getString("updatedAt"))
+        }
+    }
 }

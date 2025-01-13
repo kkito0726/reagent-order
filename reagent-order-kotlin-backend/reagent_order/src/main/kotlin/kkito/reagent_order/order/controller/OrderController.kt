@@ -7,6 +7,7 @@ import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.util.*
@@ -32,7 +33,12 @@ class OrderController(private val orderService: OrderService): ControllerUtil() 
     }
 
     @GetMapping("/order")
-    fun getUserOrder(): ResponseEntity<List<UserOrderResponse>> {
+    fun getUserOrders(): ResponseEntity<List<UserOrderResponse>> {
         return ResponseEntity.ok(orderService.getUserOrders())
+    }
+
+    @GetMapping("/order/{orderId}")
+    fun getUserOrder(@PathVariable orderId: Long): ResponseEntity<UserOrderResponse> {
+        return ResponseEntity.ok(orderService.getUserOrder(UserOrderId(orderId)))
     }
 }

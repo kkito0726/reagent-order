@@ -11,10 +11,7 @@ import kkito.reagent_order.order.entity.OrderDetailEntity
 import kkito.reagent_order.order.entity.OrderEntity
 import kkito.reagent_order.order.entity.OrderSetEntity
 import kkito.reagent_order.order.repository.OrderRepository
-import kkito.reagent_order.order.value.OrderDto
-import kkito.reagent_order.order.value.OrderStatus
-import kkito.reagent_order.order.value.ReagentCount
-import kkito.reagent_order.order.value.ReagentName
+import kkito.reagent_order.order.value.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
@@ -62,7 +59,19 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
         return orderSetEntities
     }
 
-    override fun getOrders(): List<OrderEntity> {
+    override fun getOrders(orderId: UserOrderId?): List<OrderEntity> {
+        val baseCondition = listOf(
+            USER_ORDER.DELETED_AT.isNull,
+            ORDER_DETAIL.DELETED_AT.isNull
+        )
+
+        // orderId が渡された場合、条件を追加
+        val conditions = if (orderId != null) {
+            baseCondition + USER_ORDER.ID.eq(orderId.value)
+        } else {
+            baseCondition
+        }
+
         val record = dslContext.select(
             USER_ORDER.ID.`as`("id"),
             APP_USER.APP_USER_NAME.`as`("appUserName"),
@@ -80,7 +89,7 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             .innerJoin(APP_USER).on(USER_ORDER.APP_USER_ID.eq(APP_USER.ID))
             .innerJoin(ORDER_SET).on(USER_ORDER.ID.eq(ORDER_SET.ORDER_ID))
             .innerJoin(ORDER_DETAIL).on(ORDER_SET.ORDER_DETAIL_ID.eq(ORDER_DETAIL.ID))
-            .where(USER_ORDER.DELETED_AT.isNull, ORDER_DETAIL.DELETED_AT.isNull)
+            .where(conditions)
             .orderBy(USER_ORDER.CREATED_AT)
 
         val group = record.groupBy { it["id"] as Long }

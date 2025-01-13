@@ -4,6 +4,7 @@ import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.OrderDetailResponse
 import kkito.reagent_order.order.value.OrderDto
+import kkito.reagent_order.order.value.UserOrderId
 import kkito.reagent_order.order.value.UserOrderResponse
 import org.springframework.stereotype.Service
 
@@ -52,5 +53,26 @@ class OrderService(private val orderRepository: OrderRepository) {
                 }
             )
         }
+    }
+
+    fun getUserOrder(orderId: UserOrderId): UserOrderResponse {
+        val orderEntity = orderRepository.getOrders(orderId)[0]
+        return UserOrderResponse(
+            id = orderEntity.id,
+            appUserName = orderEntity.appUserName.value,
+            title = orderEntity.title,
+            createdAt = orderEntity.createdAt,
+            orderDetails = orderEntity.orderDetailEntities.map {
+                OrderDetailResponse(
+                    orderDetailId = it.id,
+                    reagentName = it.reagentName.value,
+                    url = it.url,
+                    count = it.count.value,
+                    status = it.status.value,
+                    createdAt = it.createdAt,
+                    updatedAt = it.updatedAt
+                )
+            }
+        )
     }
 }
