@@ -1,8 +1,11 @@
 package kkito.reagent_order.order.service
 
 import kkito.reagent_order.app_user.entity.AppUserEntity
+import kkito.reagent_order.error.ErrorCode
+import kkito.reagent_order.error.NotFoundException
 import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.*
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -53,7 +56,8 @@ class OrderService(private val orderRepository: OrderRepository) {
     }
 
     fun getUserOrder(orderId: UserOrderId): UserOrderResponse {
-        val orderEntity = orderRepository.getOrders(orderId)[0]
+        val orderEntity = orderRepository.getOrders(orderId).firstOrNull()
+            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0014)
         return UserOrderResponse(
             id = orderEntity.id.value,
             appUserName = orderEntity.appUserName.value,

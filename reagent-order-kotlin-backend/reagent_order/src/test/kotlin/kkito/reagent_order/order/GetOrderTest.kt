@@ -2,6 +2,7 @@ package kkito.reagent_order.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
+import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.order.value.OrderDetailRequest
 import kkito.reagent_order.order.value.OrderStatus
 import kkito.reagent_order.order.value.UserOrderRequest
@@ -133,6 +134,16 @@ class GetOrderTest(
     }
 
     @Test
+    fun 全申請情報取得するときに申請情報が損座愛する場合からのリストが返る() {
+        val resultActions = mockMvc.perform(
+            get("/order").contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(status().isOk)
+        val responseArray = createResponseJsonArray(resultActions)
+        assertEquals("[]", responseArray.toString())
+    }
+
+    @Test
     fun 単一申請情報を取得できる() {
         val requestOrders = listOf(
             UserOrderRequest(
@@ -257,12 +268,44 @@ class GetOrderTest(
                 .header("Authorization", "Bearer $jwtToken")
         ).andExpect(status().isOk)
         val responseBody = createResponseBodyJson(resultActions)
-        assertEquals(requestOrderDetail.getString("orderDetailId"), responseBody.getString("orderDetailId"))
-        assertEquals(requestOrderDetail.getString("reagentName"), responseBody.getString("reagentName"))
+        assertEquals(
+            requestOrderDetail.getString("orderDetailId"),
+            responseBody.getString("orderDetailId")
+        )
+        assertEquals(
+            requestOrderDetail.getString("reagentName"),
+            responseBody.getString("reagentName")
+        )
         assertEquals(requestOrderDetail.getString("url"), responseBody.getString("url"))
         assertEquals(requestOrderDetail.getString("count"), responseBody.getString("count"))
         assertEquals(requestOrderDetail.getString("status"), responseBody.getString("status"))
         assertNotNull(responseBody.getString("createdAt"))
         assertEquals(requestOrderDetail.getString("updatedAt"), responseBody.getString("updatedAt"))
+    }
+
+    @Test
+    fun 申請詳細情報が見つからない場合_E0013エラーになる() {
+        val resultActions = mockMvc.perform(
+            get(
+                "/order/orderDetail/9999"
+            ).contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(status().isNotFound)
+        val responseBody = createResponseBodyJson(resultActions)
+        assertEquals(ErrorCode.E0013.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0013.message, responseBody.getString("message"))
+    }
+
+    @Test
+    fun 申請情報が見つからない場合_E0014エラーになる() {
+        val resultActions = mockMvc.perform(
+            get(
+                "/order/9999"
+            ).contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer $jwtToken")
+        ).andExpect(status().isNotFound)
+        val responseBody = createResponseBodyJson(resultActions)
+        assertEquals(ErrorCode.E0014.code, responseBody.getString("errorCode"))
+        assertEquals(ErrorCode.E0014.message, responseBody.getString("message"))
     }
 }
