@@ -1,11 +1,13 @@
 package kkito.reagent_order.order.controller
 
 import kkito.reagent_order.app_user.value.AppUserId
-import kkito.reagent_order.order.OrderService
+import kkito.reagent_order.order.service.OrderService
 import kkito.reagent_order.order.value.*
 import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.util.*
@@ -27,6 +29,21 @@ class OrderController(private val orderService: OrderService): ControllerUtil() 
                 )
             }
         )
-        return ResponseEntity.ok(orderService.postUserOrder(orderDto))
+        return ResponseEntity.ok(orderService.postUserOrder(orderDto, authAppUser))
+    }
+
+    @GetMapping("/order")
+    fun getUserOrders(): ResponseEntity<List<UserOrderResponse>> {
+        return ResponseEntity.ok(orderService.getUserOrders())
+    }
+
+    @GetMapping("/order/{orderId}")
+    fun getUserOrder(@PathVariable orderId: Long): ResponseEntity<UserOrderResponse> {
+        return ResponseEntity.ok(orderService.getUserOrder(UserOrderId(orderId)))
+    }
+
+    @GetMapping("/order/orderDetail/{orderDetailId}")
+    fun getOrderDetail(@PathVariable orderDetailId: Long): ResponseEntity<OrderDetailResponse> {
+        return ResponseEntity.ok(orderService.getOrderDetail(OrderDetailId(orderDetailId)))
     }
 }
