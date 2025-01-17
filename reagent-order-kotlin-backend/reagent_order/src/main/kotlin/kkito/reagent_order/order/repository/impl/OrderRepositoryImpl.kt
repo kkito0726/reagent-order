@@ -16,7 +16,6 @@ import kkito.reagent_order.order.value.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 @Repository
 open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderRepository {
@@ -74,17 +73,17 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
         }
 
         val record = dslContext.select(
-            USER_ORDER.ID.`as`("id"),
-            APP_USER.APP_USER_NAME.`as`("appUserName"),
-            USER_ORDER.TITLE.`as`("title"),
-            USER_ORDER.CREATED_AT.`as`("createdAt"),
-            ORDER_DETAIL.ID.`as`("orderDetailId"),
-            ORDER_DETAIL.REAGENT_NAME.`as`("reagentName"),
-            ORDER_DETAIL.URL.`as`("url"),
-            ORDER_DETAIL.COUNT.`as`("count"),
-            ORDER_DETAIL.STATUS.`as`("status"),
-            ORDER_DETAIL.CREATED_AT.`as`("orderDetailCreatedAt"),
-            ORDER_DETAIL.UPDATED_AT.`as`("orderDetailUpdatedAt")
+            USER_ORDER.ID,
+            APP_USER.APP_USER_NAME,
+            USER_ORDER.TITLE,
+            USER_ORDER.CREATED_AT,
+            ORDER_DETAIL.ID,
+            ORDER_DETAIL.REAGENT_NAME,
+            ORDER_DETAIL.URL,
+            ORDER_DETAIL.COUNT,
+            ORDER_DETAIL.STATUS,
+            ORDER_DETAIL.CREATED_AT,
+            ORDER_DETAIL.UPDATED_AT
         )
             .from(USER_ORDER)
             .innerJoin(APP_USER).on(USER_ORDER.APP_USER_ID.eq(APP_USER.ID))
@@ -93,23 +92,23 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             .where(conditions)
             .orderBy(USER_ORDER.CREATED_AT)
 
-        val group = record.groupBy { it["id"] as Long }
+        val group = record.groupBy { it[USER_ORDER.ID] }
         return group.map { (id, row) ->
             val firstRow = row.first()
             OrderEntity(
                 id = UserOrderId(id),
-                appUserName = AppUserName(firstRow["appUserName"] as String),
-                title = firstRow["title"] as String,
-                createdAt = firstRow["createdAt"] as LocalDateTime,
+                appUserName = AppUserName(firstRow[APP_USER.APP_USER_NAME]),
+                title = firstRow[USER_ORDER.TITLE],
+                createdAt = firstRow[USER_ORDER.CREATED_AT],
                 orderDetailEntities = row.map {
                     OrderDetailEntity(
-                        id = OrderDetailId(it["orderDetailId"] as Long),
-                        reagentName = ReagentName(it["reagentName"] as String),
-                        url = it["url"] as String,
-                        count = ReagentCount(it["count"] as Int),
-                        status = OrderStatus.fromValue(it["status"] as String),
-                        createdAt = it["orderDetailCreatedAt"] as LocalDateTime,
-                        updatedAt = it["orderDetailUpdatedAt"] as LocalDateTime?
+                        id = OrderDetailId(it[ORDER_DETAIL.ID]),
+                        reagentName = ReagentName(it[ORDER_DETAIL.REAGENT_NAME]),
+                        url = it[ORDER_DETAIL.URL],
+                        count = ReagentCount(it[ORDER_DETAIL.COUNT]),
+                        status = OrderStatus.fromValue(it[ORDER_DETAIL.STATUS]),
+                        createdAt = it[ORDER_DETAIL.CREATED_AT],
+                        updatedAt = it[ORDER_DETAIL.UPDATED_AT]
                     )
                 }
             )
@@ -130,13 +129,13 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             .fetchOne()
             ?: throw NotFoundException(ErrorCode.E0013)
         return OrderDetailEntity(
-            id = OrderDetailId(record["id"] as Long),
-            reagentName = ReagentName(record["reagent_name"] as String),
-            url = record["url"] as String,
-            count = ReagentCount(record["count"] as Int),
-            status = OrderStatus.fromValue(record["status"] as String),
-            createdAt = record["created_at"] as LocalDateTime,
-            updatedAt = record["updated_at"] as LocalDateTime?
+            id = OrderDetailId(record[ORDER_DETAIL.ID]),
+            reagentName = ReagentName(record[ORDER_DETAIL.REAGENT_NAME]),
+            url = record[ORDER_DETAIL.URL],
+            count = ReagentCount(record[ORDER_DETAIL.COUNT]),
+            status = OrderStatus.fromValue(record[ORDER_DETAIL.STATUS]),
+            createdAt = record[ORDER_DETAIL.CREATED_AT],
+            updatedAt = record[ORDER_DETAIL.UPDATED_AT]
         )
     }
 }
