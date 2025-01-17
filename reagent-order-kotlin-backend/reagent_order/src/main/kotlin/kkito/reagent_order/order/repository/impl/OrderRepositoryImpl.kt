@@ -15,7 +15,6 @@ import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -129,7 +128,7 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
         ).from(ORDER_DETAIL)
             .where(ORDER_DETAIL.ID.eq(orderDetailId.value))
             .fetchOne()
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0013)
+            ?: throw NotFoundException(ErrorCode.E0013)
         return OrderDetailEntity(
             id = OrderDetailId(record["id"] as Long),
             reagentName = ReagentName(record["reagent_name"] as String),

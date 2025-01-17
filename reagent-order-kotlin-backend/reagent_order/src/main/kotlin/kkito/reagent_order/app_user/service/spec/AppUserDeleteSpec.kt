@@ -4,7 +4,6 @@ import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.value.AppUserId
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.error.ForbiddenException
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,7 +11,7 @@ class AppUserDeleteSpec {
     fun check(appUserId: AppUserId, authAppUserEntity: AppUserEntity) {
         // パスパラメータとログインユーザのIDが異なる場合認証エラー
         if (appUserId != authAppUserEntity.id) {
-            throw ForbiddenException(HttpStatus.FORBIDDEN, ErrorCode.E0009)
+            throw ForbiddenException(ErrorCode.E0009)
         }
     }
 }

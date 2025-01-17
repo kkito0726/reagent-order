@@ -57,7 +57,7 @@ class OrderService(private val orderRepository: OrderRepository) {
 
     fun getUserOrder(orderId: UserOrderId): UserOrderResponse {
         val orderEntity = orderRepository.getOrders(orderId).firstOrNull()
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0014)
+            ?: throw NotFoundException(ErrorCode.E0014)
         return UserOrderResponse(
             id = orderEntity.id.value,
             appUserName = orderEntity.appUserName.value,
