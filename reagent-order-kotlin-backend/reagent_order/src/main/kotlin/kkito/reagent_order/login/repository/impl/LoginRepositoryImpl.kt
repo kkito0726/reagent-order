@@ -9,7 +9,6 @@ import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.error.NotFoundException
 import kkito.reagent_order.login.repository.LoginRepository
 import org.jooq.DSLContext
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -21,7 +20,7 @@ open class LoginRepositoryImpl(
             .where(APP_USER.EMAIL.eq(email.value))
             .and(APP_USER.PASSWORD.eq(password.value))
             .fetchOneInto(AppUserEntity::class.java)
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+            ?: throw NotFoundException(ErrorCode.E0006)
     }
 
     override fun getAppUserByEmail(email: Email): AppUserEntity {
@@ -29,7 +28,7 @@ open class LoginRepositoryImpl(
             .where(APP_USER.EMAIL.eq(email.value))
             .and(APP_USER.DELETED_AT.isNull)
             .fetchOneInto(AppUserEntity::class.java)
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+            ?: throw NotFoundException(ErrorCode.E0006)
     }
 
     override fun getAppUserByAppUserId(appUserId: AppUserId): AppUserEntity {
@@ -37,6 +36,6 @@ open class LoginRepositoryImpl(
             .where(APP_USER.ID.eq(appUserId.appUserId.toString()))
             .and(APP_USER.DELETED_AT.isNull)
             .fetchOneInto(AppUserEntity::class.java)
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+            ?: throw NotFoundException(ErrorCode.E0006)
     }
 }

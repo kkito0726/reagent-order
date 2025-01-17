@@ -8,7 +8,6 @@ import kkito.reagent_order.error.ForbiddenException
 import kkito.reagent_order.login.JwtUtil
 import kkito.reagent_order.login.repository.LoginRepository
 import kkito.reagent_order.login.value.LoginResponse
-import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -23,7 +22,7 @@ class LoginService(
     fun getAppUser(email: Email, password: Password): LoginResponse {
         val appUserEntity = loginRepository.getAppUserByEmail(email)
         if (!passwordEncoder.matches(password.value, appUserEntity.password.value)) {
-            throw ForbiddenException(HttpStatus.FORBIDDEN, ErrorCode.E0008)
+            throw ForbiddenException(ErrorCode.E0008)
         }
         return LoginResponse(
             AppUserResponse(

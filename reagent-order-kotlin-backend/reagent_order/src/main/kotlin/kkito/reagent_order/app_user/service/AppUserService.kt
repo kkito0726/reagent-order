@@ -10,7 +10,6 @@ import kkito.reagent_order.app_user.value.AppUserDto
 import kkito.reagent_order.app_user.value.AppUserId
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.error.NotFoundException
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,7 +35,7 @@ open class AppUserService(
 
     fun getAppUser(appUserId: AppUserId): AppUserEntity {
         return appUserRepository.getAppUser(appUserId)
-            ?: throw NotFoundException(HttpStatus.NOT_FOUND, ErrorCode.E0006)
+            ?: throw NotFoundException(ErrorCode.E0006)
     }
 
     fun updateAppUser(
