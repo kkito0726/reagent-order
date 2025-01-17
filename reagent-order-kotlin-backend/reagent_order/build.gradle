@@ -1,3 +1,0 @@
-springBoot {
-    mainClass = 'kkito.reagent_order.ReagentOrderApplicationKt'
-}
