@@ -6,6 +6,7 @@ import kkito.reagent_order.order.value.*
 import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import java.util.*
 
 @Controller
-class OrderController(private val orderService: OrderService): ControllerUtil() {
+class OrderController(private val orderService: OrderService) : ControllerUtil() {
     @PostMapping("/order")
     fun postUserOrder(@RequestBody userOrderRequest: UserOrderRequest): ResponseEntity<UserOrderResponse> {
         val authAppUser = user()
@@ -45,5 +46,26 @@ class OrderController(private val orderService: OrderService): ControllerUtil() 
     @GetMapping("/order/orderDetail/{orderDetailId}")
     fun getOrderDetail(@PathVariable orderDetailId: Long): ResponseEntity<OrderDetailResponse> {
         return ResponseEntity.ok(orderService.getOrderDetail(OrderDetailId(orderDetailId)))
+    }
+
+    @DeleteMapping("/order/{orderId}")
+    fun deleteOrder(@PathVariable orderId: Long): ResponseEntity<Any> {
+        val authAppUserEntity = user()
+        return ResponseEntity.ok(
+            orderService.deleteOrder(
+                UserOrderId(orderId),
+                authAppUserEntity
+            )
+        )
+    }
+    @DeleteMapping("/order/orderDetail/{orderDetailId}")
+    fun deleteOrderDetail(@PathVariable orderDetailId: Long): ResponseEntity<Any> {
+        val authAppUserEntity = user()
+        return ResponseEntity.ok(
+            orderService.deleteOrderDetail(
+                OrderDetailId(orderDetailId),
+                authAppUserEntity
+            )
+        )
     }
 }
