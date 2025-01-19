@@ -22,7 +22,6 @@ import kotlin.test.assertNotNull
 
 class GetOrderTest(
     @Autowired private val mockMvc: MockMvc,
-    @Autowired private val objectMapper: ObjectMapper,
     @Autowired private val testDataAppUser: TestDataAppUser,
     @Autowired private val testDataOrder: TestDataOrder,
 ) : TestSupport() {
