@@ -61,6 +61,40 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
         return orderSetEntities
     }
 
+    override fun createOrderDetail(
+        orderId: UserOrderId,
+        orderDetailDto: OrderDetailDto
+    ): OrderSetEntity {
+        return dslContext.transactionResult { config ->
+            val ctx = DSL.using(config)
+            val orderDetailRecord = ctx.insertInto(ORDER_DETAIL)
+                .set(ORDER_DETAIL.REAGENT_NAME, orderDetailDto.reagentName.value)
+                .set(ORDER_DETAIL.URL, orderDetailDto.url)
+                .set(ORDER_DETAIL.COUNT, orderDetailDto.count)
+                .set(ORDER_DETAIL.STATUS, orderDetailDto.status.value)
+                .set(ORDER_DETAIL.CREATED_AT, orderDetailDto.createdAt)
+                .returning(ORDER_DETAIL.ID)
+                .fetchOne()
+                ?: throw InternalServerError(ErrorCode.E0012)
+            val orderDetailId = orderDetailRecord.id
+
+            ctx.insertInto(ORDER_SET)
+                .set(ORDER_SET.ORDER_ID, orderId.value)
+                .set(ORDER_SET.ORDER_DETAIL_ID, orderDetailId)
+                .returning()
+                .fetchOne()
+                ?.into(OrderSetEntity::class.java)
+                ?: throw InternalServerError(ErrorCode.E0012)
+        }
+    }
+
+    override fun isOrderExist(orderId: UserOrderId): Boolean {
+        return (dslContext.selectCount()
+            .from(USER_ORDER)
+            .where(USER_ORDER.ID.eq(orderId.value))
+            .fetchOne(0, Int::class.java) ?: 0) > 0
+    }
+
     override fun getOrders(orderId: UserOrderId?): List<OrderEntity> {
         val baseCondition = listOf(
             USER_ORDER.DELETED_AT.isNull,

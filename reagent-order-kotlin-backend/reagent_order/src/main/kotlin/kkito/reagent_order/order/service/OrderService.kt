@@ -34,6 +34,25 @@ class OrderService(
         )
     }
 
+    fun postOrderDetail(
+        orderId: UserOrderId,
+        orderDetailDto: OrderDetailDto,
+        authAppUserEntity: AppUserEntity
+    ): OrderDetailResponse {
+        orderAuthSpec.check(orderId, authAppUserEntity)
+        val orderSetEntity = orderRepository.createOrderDetail(orderId, orderDetailDto)
+
+        return OrderDetailResponse(
+            orderDetailId = orderSetEntity.orderDetailId,
+            reagentName = orderDetailDto.reagentName.value,
+            url = orderDetailDto.url,
+            count = orderDetailDto.count,
+            status = orderDetailDto.status.value,
+            createdAt = orderDetailDto.createdAt,
+            updatedAt = null
+        )
+    }
+
     fun getUserOrders(): List<UserOrderResponse> {
         val orderEntities = orderRepository.getOrders()
 

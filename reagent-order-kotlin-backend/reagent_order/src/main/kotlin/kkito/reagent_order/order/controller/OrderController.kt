@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import java.time.LocalDateTime
 import java.util.*
 
 @Controller
@@ -31,6 +32,29 @@ class OrderController(private val orderService: OrderService) : ControllerUtil()
             }
         )
         return ResponseEntity.ok(orderService.postUserOrder(orderDto, authAppUser))
+    }
+
+    // 申請詳細追加API
+    @PostMapping("/order/orderDetail/{orderId}")
+    fun postOrderDetail(
+        @PathVariable orderId: Long,
+        @RequestBody orderDetailRequest: OrderDetailRequest
+    ): ResponseEntity<OrderDetailResponse> {
+        val authAppUserEntity = user()
+        val orderDetailDto = OrderDetailDto(
+            reagentName = ReagentName(orderDetailRequest.reagentName),
+            url = orderDetailRequest.url,
+            count = orderDetailRequest.count,
+            status = OrderStatus.PENDING,
+            createdAt = LocalDateTime.now()
+        )
+        return ResponseEntity.ok(
+            orderService.postOrderDetail(
+                UserOrderId(orderId),
+                orderDetailDto,
+                authAppUserEntity
+            )
+        )
     }
 
     @GetMapping("/order")
@@ -58,6 +82,7 @@ class OrderController(private val orderService: OrderService) : ControllerUtil()
             )
         )
     }
+
     @DeleteMapping("/order/orderDetail/{orderDetailId}")
     fun deleteOrderDetail(@PathVariable orderDetailId: Long): ResponseEntity<Any> {
         val authAppUserEntity = user()
