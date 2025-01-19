@@ -170,7 +170,7 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             if (orderDetailIds.isNotEmpty()) {
                 ctx.update(ORDER_DETAIL)
                     .set(ORDER_DETAIL.DELETED_AT, LocalDateTime.now())
-                    .where(ORDER_DETAIL.ID.`in`(orderDetailIds))
+                    .where(ORDER_DETAIL.ID.`in`(orderDetailIds.map { it.value }))
                     .execute()
             }
         }
