@@ -1,6 +1,5 @@
 package kkito.reagent_order.order
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.order.value.OrderDetailRequest
