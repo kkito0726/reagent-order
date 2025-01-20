@@ -132,7 +132,7 @@ class GetOrderTest(
     }
 
     @Test
-    fun 全申請情報取得するときに申請情報が損座愛する場合からのリストが返る() {
+    fun 全申請情報取得するときに申請情報が存在しない場合_空のリストが返る() {
         val resultActions = mockMvc.perform(
             get("/order").contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer $jwtToken")
