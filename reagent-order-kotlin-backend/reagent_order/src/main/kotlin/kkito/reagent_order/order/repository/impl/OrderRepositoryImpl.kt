@@ -4,6 +4,7 @@ import com.generate.jooq.Tables.APP_USER
 import com.generate.jooq.Tables.ORDER_DETAIL
 import com.generate.jooq.Tables.ORDER_SET
 import com.generate.jooq.Tables.USER_ORDER
+import kkito.reagent_order.app_user.value.AppUserId
 import kkito.reagent_order.app_user.value.AppUserName
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.error.InternalServerError
@@ -16,6 +17,7 @@ import kkito.reagent_order.order.value.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderRepository {
@@ -57,6 +59,40 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             }
         }
         return orderSetEntities
+    }
+
+    override fun createOrderDetail(
+        orderId: UserOrderId,
+        orderDetailDto: OrderDetailDto
+    ): OrderSetEntity {
+        return dslContext.transactionResult { config ->
+            val ctx = DSL.using(config)
+            val orderDetailRecord = ctx.insertInto(ORDER_DETAIL)
+                .set(ORDER_DETAIL.REAGENT_NAME, orderDetailDto.reagentName.value)
+                .set(ORDER_DETAIL.URL, orderDetailDto.url)
+                .set(ORDER_DETAIL.COUNT, orderDetailDto.count)
+                .set(ORDER_DETAIL.STATUS, orderDetailDto.status.value)
+                .set(ORDER_DETAIL.CREATED_AT, orderDetailDto.createdAt)
+                .returning(ORDER_DETAIL.ID)
+                .fetchOne()
+                ?: throw InternalServerError(ErrorCode.E0012)
+            val orderDetailId = orderDetailRecord.id
+
+            ctx.insertInto(ORDER_SET)
+                .set(ORDER_SET.ORDER_ID, orderId.value)
+                .set(ORDER_SET.ORDER_DETAIL_ID, orderDetailId)
+                .returning()
+                .fetchOne()
+                ?.into(OrderSetEntity::class.java)
+                ?: throw InternalServerError(ErrorCode.E0012)
+        }
+    }
+
+    override fun isOrderExist(orderId: UserOrderId): Boolean {
+        return (dslContext.selectCount()
+            .from(USER_ORDER)
+            .where(USER_ORDER.ID.eq(orderId.value))
+            .fetchOne(0, Int::class.java) ?: 0) > 0
     }
 
     override fun getOrders(orderId: UserOrderId?): List<OrderEntity> {
@@ -126,6 +162,7 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             ORDER_DETAIL.UPDATED_AT
         ).from(ORDER_DETAIL)
             .where(ORDER_DETAIL.ID.eq(orderDetailId.value))
+            .and(ORDER_DETAIL.DELETED_AT.isNull())
             .fetchOne()
             ?: throw NotFoundException(ErrorCode.E0013)
         return OrderDetailEntity(
@@ -137,5 +174,46 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             createdAt = record[ORDER_DETAIL.CREATED_AT],
             updatedAt = record[ORDER_DETAIL.UPDATED_AT]
         )
+    }
+
+    override fun getAppUserIdByOrderId(orderId: UserOrderId): AppUserId? {
+        return dslContext.select(APP_USER.ID)
+            .from(USER_ORDER)
+            .innerJoin(APP_USER).on(USER_ORDER.APP_USER_ID.eq(APP_USER.ID))
+            .where(USER_ORDER.ID.eq(orderId.value))
+            .fetchOneInto(AppUserId::class.java)
+    }
+
+    override fun getAppUserIdByOrderDetailId(orderDetailId: OrderDetailId): AppUserId? {
+        return dslContext.select(APP_USER.ID)
+            .from(ORDER_SET)
+            .innerJoin(USER_ORDER).on(ORDER_SET.ORDER_ID.eq(USER_ORDER.ID))
+            .innerJoin(APP_USER).on(USER_ORDER.APP_USER_ID.eq(APP_USER.ID))
+            .where(ORDER_SET.ORDER_DETAIL_ID.eq(orderDetailId.value))
+            .fetchOneInto(AppUserId::class.java)
+    }
+
+    override fun deleteOrder(orderId: UserOrderId, orderDetailIds: List<OrderDetailId>) {
+        dslContext.transaction { configuration ->
+            val ctx = DSL.using(configuration)
+            ctx.update(USER_ORDER)
+                .set(USER_ORDER.DELETED_AT, LocalDateTime.now())
+                .where(USER_ORDER.ID.eq(orderId.value))
+                .execute()
+
+            if (orderDetailIds.isNotEmpty()) {
+                ctx.update(ORDER_DETAIL)
+                    .set(ORDER_DETAIL.DELETED_AT, LocalDateTime.now())
+                    .where(ORDER_DETAIL.ID.`in`(orderDetailIds.map { it.value }))
+                    .execute()
+            }
+        }
+    }
+
+    override fun deleteOrderDetail(orderDetailId: OrderDetailId) {
+        dslContext.update(ORDER_DETAIL)
+            .set(ORDER_DETAIL.DELETED_AT, LocalDateTime.now())
+            .where(ORDER_DETAIL.ID.eq(orderDetailId.value))
+            .execute()
     }
 }

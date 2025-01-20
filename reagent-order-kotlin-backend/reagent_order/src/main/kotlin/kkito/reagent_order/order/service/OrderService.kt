@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
-class OrderService(private val orderRepository: OrderRepository) {
+class OrderService(
+    private val orderRepository: OrderRepository,
+    private val orderAuthSpec: OrderAuthSpec
+) {
     fun postUserOrder(userOrderDto: OrderDto, authAppUser: AppUserEntity): UserOrderResponse {
         val orderSetEntities = orderRepository.createOrder(userOrderDto)
         return UserOrderResponse(
@@ -28,6 +31,25 @@ class OrderService(private val orderRepository: OrderRepository) {
                     null
                 )
             }
+        )
+    }
+
+    fun postOrderDetail(
+        orderId: UserOrderId,
+        orderDetailDto: OrderDetailDto,
+        authAppUserEntity: AppUserEntity
+    ): OrderDetailResponse {
+        orderAuthSpec.check(orderId, authAppUserEntity)
+        val orderSetEntity = orderRepository.createOrderDetail(orderId, orderDetailDto)
+
+        return OrderDetailResponse(
+            orderDetailId = orderSetEntity.orderDetailId,
+            reagentName = orderDetailDto.reagentName.value,
+            url = orderDetailDto.url,
+            count = orderDetailDto.count,
+            status = orderDetailDto.status.value,
+            createdAt = orderDetailDto.createdAt,
+            updatedAt = null
         )
     }
 
@@ -88,5 +110,19 @@ class OrderService(private val orderRepository: OrderRepository) {
             createdAt = orderDetailEntity.createdAt,
             updatedAt = orderDetailEntity.updatedAt,
         )
+    }
+
+    fun deleteOrder(orderId: UserOrderId, authAppUserEntity: AppUserEntity) {
+        orderAuthSpec.check(orderId, authAppUserEntity)
+        val orderDetailIds =
+            orderRepository.getOrders(orderId).firstOrNull()?.orderDetailEntities?.map {
+                it.id
+            } ?: listOf()
+        orderRepository.deleteOrder(orderId, orderDetailIds)
+    }
+
+    fun deleteOrderDetail(orderDetailId: OrderDetailId, authAppUserEntity: AppUserEntity) {
+        orderAuthSpec.check(orderDetailId, authAppUserEntity)
+        orderRepository.deleteOrderDetail(orderDetailId)
     }
 }

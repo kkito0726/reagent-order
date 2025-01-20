@@ -1,6 +1,5 @@
 package kkito.reagent_order.order
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.order.value.OrderDetailRequest
@@ -22,7 +21,6 @@ import kotlin.test.assertNotNull
 
 class GetOrderTest(
     @Autowired private val mockMvc: MockMvc,
-    @Autowired private val objectMapper: ObjectMapper,
     @Autowired private val testDataAppUser: TestDataAppUser,
     @Autowired private val testDataOrder: TestDataOrder,
 ) : TestSupport() {
@@ -134,7 +132,7 @@ class GetOrderTest(
     }
 
     @Test
-    fun 全申請情報取得するときに申請情報が損座愛する場合からのリストが返る() {
+    fun 全申請情報取得するときに申請情報が存在しない場合_空のリストが返る() {
         val resultActions = mockMvc.perform(
             get("/order").contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer $jwtToken")
