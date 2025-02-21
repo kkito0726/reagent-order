@@ -5,7 +5,6 @@ import kkito.reagent_order.app_user.service.AppUserService
 import kkito.reagent_order.app_user.value.*
 import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,14 +19,15 @@ class AppUserController(
     private val appUserService: AppUserService,
 ) : ControllerUtil() {
     @PostMapping("/app_user/create")
-    fun createAppUser(@RequestBody appUserRequest: AppUserRequest): ResponseEntity<AppUserResponse> {
+    fun createAppUser(@RequestBody createAppUserRequest: CreateAppUserRequest): ResponseEntity<AppUserResponse> {
         val appUser = AppUserEntity(
             AppUserId(UUID.randomUUID()),
-            AppUserName(appUserRequest.appUserName),
-            Email(appUserRequest.email),
-            Password(appUserRequest.password),
+            AppUserName(createAppUserRequest.appUserName),
+            Email(createAppUserRequest.email),
+            Password(createAppUserRequest.password),
             LocalDateTime.now(),
-            null
+            null,
+            Role.USER
         )
 
         return ResponseEntity.ok(appUserService.createAppUser(appUser))
@@ -36,7 +36,7 @@ class AppUserController(
     @PutMapping("app_user/{id}")
     fun updateAppUser(
         @PathVariable id: UUID,
-        @RequestBody appUserRequest: AppUserRequest
+        @RequestBody appUserRequest: UpdateAppUserRequest
     ): ResponseEntity<AppUserResponse> {
         val authAppUserEntity = user()
         val newAppUserDto = AppUserDto(
@@ -44,6 +44,11 @@ class AppUserController(
             AppUserName(appUserRequest.appUserName),
             Email(appUserRequest.email),
             Password(appUserRequest.password),
+            if (appUserRequest.role != null) {
+                Role.fromValue(appUserRequest.role)
+            } else {
+                Role.fromValue(authAppUserEntity.role.value)
+            }
         )
         return ResponseEntity.ok(appUserService.updateAppUser(newAppUserDto, authAppUserEntity))
     }

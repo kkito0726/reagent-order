@@ -7,4 +7,5 @@ data class AppUserResponse(
     val appUserName: String,
     val email: String,
     val createdAt: LocalDateTime?,
+    val role: Role
 )

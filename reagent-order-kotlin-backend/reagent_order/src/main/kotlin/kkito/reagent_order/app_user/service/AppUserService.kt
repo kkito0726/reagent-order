@@ -30,6 +30,7 @@ open class AppUserService(
             appUserEntity.appUserName.toString(),
             appUserEntity.email.toString(),
             appUserEntity.createdAt,
+            appUserEntity.role
         )
     }
 
@@ -51,7 +52,8 @@ open class AppUserService(
             newAppUserDto.id.toString(),
             newAppUserDto.appUserName.value,
             newAppUserDto.email.value,
-            null
+            null,
+            newAppUserDto.role
         )
     }
 
