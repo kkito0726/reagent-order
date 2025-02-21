@@ -2,6 +2,7 @@ package kkito.reagent_order.login
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
+import kkito.reagent_order.app_user.value.Role
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.login.value.LoginRequest
 import kkito.reagent_order.test_data.TestDataAppUser
@@ -47,6 +48,12 @@ class LoginTest(
         assertNotNull(
             responseBody.getString("loginId")
         )
+        val loginUser =  responseBody.getJSONObject("appUserEntity")
+        assertNotNull(loginUser.getString("id"))
+        assertEquals(loginUser.getString("appUserName"), "テスト 太郎")
+        assertEquals(loginUser.getString("email"), "test_email@test.gmail.com")
+        assertEquals(loginUser.getString("role"), Role.USER.value)
+        assertNotNull(loginUser.getString("createdAt"))
     }
 
     @Test
