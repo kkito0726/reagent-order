@@ -45,6 +45,7 @@ open class AppUserRepositoryImpl(
             .set(APP_USER.APP_USER_NAME, newAppUserDto.appUserName.value)
             .set(APP_USER.EMAIL, newAppUserDto.email.value)
             .set(APP_USER.PASSWORD, passwordEncoder.encode(newAppUserDto.password.value))
+            .set(APP_USER.ROLE, newAppUserDto.role.value)
             .where(APP_USER.ID.eq(newAppUserDto.id.toString())).execute()
     }
 
