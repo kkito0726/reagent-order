@@ -2,7 +2,8 @@ package kkito.reagent_order.app_user
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
-import kkito.reagent_order.app_user.value.AppUserRequest
+import kkito.reagent_order.app_user.value.UpdateAppUserRequest
+import kkito.reagent_order.app_user.value.Role
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.test_data.TestDataAppUser
 import org.assertj.db.api.Assertions
@@ -56,10 +57,11 @@ class UpdateAppUserTest(
         email: String,
         password: String
     ) {
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             userName,
             email,
-            password
+            password,
+            null
         )
 
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
@@ -75,6 +77,7 @@ class UpdateAppUserTest(
         assertNotNull(responseBody.getString("id"))
         assertEquals(responseBody.getString("appUserName"), request.appUserName)
         assertEquals(responseBody.getString("email"), request.email)
+        assertEquals(responseBody.getString("role"), Role.USER.value)
 
         Assertions.assertThat(changes)
             .ofModificationOnTable("app_user")
@@ -91,15 +94,17 @@ class UpdateAppUserTest(
             .value("password").isNotNull
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()
+            .value("role").isEqualTo("USER")
     }
 
     @Test
     fun パスワード変更後_新しいパスワードでログインできる() {
         val newPassword = "New_password_87654321"
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             "テスト 太郎",
             "test_email@test.gmail.com",
-            newPassword
+            newPassword,
+            null
         )
 
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
@@ -128,10 +133,11 @@ class UpdateAppUserTest(
                 email = "second_user@test.gmail.com"
             )
         )
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             "テスト 太郎2",
             "test_email@test.gmail.com",
-            "Test_pass_12345678"
+            "Test_pass_12345678",
+            null
         )
 
         val resultActions = mockMvc.perform(
@@ -154,10 +160,11 @@ class UpdateAppUserTest(
                 email = "second_user@test.gmail.com"
             )
         )
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             "てすと 太郎",
             "second_user@test.gmail.com",
-            "Test_pass_12345678"
+            "Test_pass_12345678",
+            null
         )
 
         val resultActions = mockMvc.perform(
@@ -180,10 +187,11 @@ class UpdateAppUserTest(
                 email = "second_user@test.gmail.com"
             )
         )
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             "てすと 太郎",
             "second_user@test.gmail.com",
-            "Test_pass_12345678"
+            "Test_pass_12345678",
+            null
         )
 
         val resultActions = mockMvc.perform(
@@ -202,10 +210,11 @@ class UpdateAppUserTest(
     fun 退会済みのユーザーを更新しようとする場合_E0006エラーになる() {
         testDataAppUser.deleteAppUser(createdUserResponse.getString("id"), jwtToken)
 
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             "てすと 太郎",
             "second_user@test.gmail.com",
-            "Test_pass_12345678"
+            "Test_pass_12345678",
+            null
         )
 
         val resultActions = mockMvc.perform(
@@ -223,10 +232,11 @@ class UpdateAppUserTest(
 
     @Test
     fun JWTの形式が不正な場合() {
-        val request = AppUserRequest(
+        val request = UpdateAppUserRequest(
             "てすと 太郎",
             "second_user@test.gmail.com",
-            "Test_pass_12345678"
+            "Test_pass_12345678",
+            null
         )
 
         val resultActions = mockMvc.perform(

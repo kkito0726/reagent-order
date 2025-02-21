@@ -1,8 +1,7 @@
 package kkito.reagent_order.test_data
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kkito.reagent_order.TestSupport
-import kkito.reagent_order.app_user.value.AppUserRequest
+import kkito.reagent_order.app_user.value.CreateAppUserRequest
 import kkito.reagent_order.login.value.LoginRequest
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +25,7 @@ class TestDataAppUser {
         email: String = "test_email@test.gmail.com",
         password: String = "Test_pass_12345678",
     ): ResultActions {
-        val request = AppUserRequest(
+        val request = CreateAppUserRequest(
             appUserName,
             email,
             password

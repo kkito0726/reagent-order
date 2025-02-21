@@ -3,7 +3,8 @@ package kkito.reagent_order.app_user
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.generate.jooq.Tables.APP_USER
 import kkito.reagent_order.TestSupport
-import kkito.reagent_order.app_user.value.AppUserRequest
+import kkito.reagent_order.app_user.value.CreateAppUserRequest
+import kkito.reagent_order.app_user.value.Role
 import kkito.reagent_order.error.ErrorCode
 import org.assertj.db.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -40,7 +41,7 @@ class CreateAppUserTest(
 
     @Test
     fun ユーザー登録できる() {
-        val request = AppUserRequest(
+        val request = CreateAppUserRequest(
             "テスト 太郎",
             "test_email@test.gmail.com",
             "Test_pass_12345678"
@@ -65,6 +66,7 @@ class CreateAppUserTest(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")
             )
         )
+        assertEquals(responseBody.getString("role"), Role.USER.value)
 
         // DBアサート
         Assertions.assertThat(changes)
@@ -83,6 +85,7 @@ class CreateAppUserTest(
             .value("password").isEqualTo(password)
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()
+            .value("role").isEqualTo(Role.USER.value)
     }
 
     @ParameterizedTest
@@ -91,7 +94,7 @@ class CreateAppUserTest(
         "ユーザー名が16文字異常の場合_E0001エラーになる, 16",
     )
     fun ユーザー名の文字数が不正な場合_E0001エラーになる(display: String, nameLength: Int) {
-        val request = AppUserRequest(
+        val request = CreateAppUserRequest(
             "a".repeat(nameLength),
             "test_email",
             "1234"
@@ -107,7 +110,7 @@ class CreateAppUserTest(
 
     @Test
     fun メールアドレスの形式担っていない場合の場合_E0002エラーになる() {
-        val request = AppUserRequest(
+        val request = CreateAppUserRequest(
             "テスト 太郎",
             "test_email",
             "test_pass_12345678"
@@ -123,7 +126,7 @@ class CreateAppUserTest(
 
     @Test
     fun パスワードの文字数が5文字未満の場合_E0003エラーになる() {
-        val request = AppUserRequest(
+        val request = CreateAppUserRequest(
             "テスト 太郎",
             "test_email@test.gmail.com",
             "1234"
@@ -139,13 +142,13 @@ class CreateAppUserTest(
 
     @Test
     fun ユーザー名が重複している場合_E_0004エラーになる() {
-        val request1 = AppUserRequest(
+        val request1 = CreateAppUserRequest(
             "test user name",
             "test_email@test.gmail.com",
             "Test_pass_12345678"
         )
 
-        val request2 = AppUserRequest(
+        val request2 = CreateAppUserRequest(
             "test user name",
             "test_email_2@test.gmail.com",
             "Test_pass_12345678"
@@ -169,13 +172,13 @@ class CreateAppUserTest(
 
     @Test
     fun メールアドレスが重複している場合_E0005エラーになる() {
-        val request1 = AppUserRequest(
+        val request1 = CreateAppUserRequest(
             "test user name",
             "test_email@test.gmail.com",
             "Test_pass_12345678"
         )
 
-        val request2 = AppUserRequest(
+        val request2 = CreateAppUserRequest(
             "テスト 太郎",
             "test_email@test.gmail.com",
             "Test_pass_12345678"

@@ -5,4 +5,5 @@ data class AppUserDto (
     val appUserName: AppUserName,
     val email: Email,
     val password: Password,
+    val role: Role,
 )

@@ -1,7 +1,8 @@
 package kkito.reagent_order.app_user.value
 
-data class AppUserRequest(
+data class UpdateAppUserRequest(
     val appUserName: String,
     val email: String,
-    val password: String
+    val password: String,
+    val role: String?,
 )

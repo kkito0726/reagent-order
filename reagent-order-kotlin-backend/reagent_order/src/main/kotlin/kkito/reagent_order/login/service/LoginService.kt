@@ -29,7 +29,8 @@ class LoginService(
                 appUserEntity.id.toString(),
                 appUserEntity.appUserName.value,
                 appUserEntity.email.value,
-                appUserEntity.createdAt
+                appUserEntity.createdAt,
+                appUserEntity.role
             ),
             jwtUtil.generateToken(appUserEntity.id)
         )
