@@ -193,6 +193,13 @@ open class OrderRepositoryImpl(private val dslContext: DSLContext) : OrderReposi
             .fetchOneInto(AppUserId::class.java)
     }
 
+    override fun changeOrderDetailStatus(orderDetailId: OrderDetailId, orderStatus: OrderStatus) {
+        dslContext.update(ORDER_DETAIL)
+            .set(ORDER_DETAIL.STATUS, orderStatus.value)
+            .set(ORDER_DETAIL.UPDATED_AT, LocalDateTime.now())
+            .where(ORDER_DETAIL.ID.eq(orderDetailId.value))
+            .execute()
+    }
     override fun deleteOrder(orderId: UserOrderId, orderDetailIds: List<OrderDetailId>) {
         dslContext.transaction { configuration ->
             val ctx = DSL.using(configuration)

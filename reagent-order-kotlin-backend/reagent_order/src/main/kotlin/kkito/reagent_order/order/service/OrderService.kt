@@ -1,7 +1,9 @@
 package kkito.reagent_order.order.service
 
 import kkito.reagent_order.app_user.entity.AppUserEntity
+import kkito.reagent_order.app_user.value.Role
 import kkito.reagent_order.error.ErrorCode
+import kkito.reagent_order.error.ForbiddenException
 import kkito.reagent_order.error.NotFoundException
 import kkito.reagent_order.order.repository.OrderRepository
 import kkito.reagent_order.order.value.*
@@ -101,6 +103,29 @@ class OrderService(
 
     fun getOrderDetail(orderDetailId: OrderDetailId): OrderDetailResponse {
         val orderDetailEntity = orderRepository.getOrderDetail(orderDetailId)
+        return OrderDetailResponse(
+            orderDetailId = orderDetailEntity.id.value,
+            reagentName = orderDetailEntity.reagentName.value,
+            url = orderDetailEntity.url,
+            count = orderDetailEntity.count.value,
+            status = orderDetailEntity.status.value,
+            createdAt = orderDetailEntity.createdAt,
+            updatedAt = orderDetailEntity.updatedAt,
+        )
+    }
+
+    fun changeOrderDetailStatus(
+        authAppUserEntity: AppUserEntity,
+        orderDetailId: OrderDetailId,
+        orderStatus: OrderStatus
+    ): OrderDetailResponse {
+        if (authAppUserEntity.role !in listOf(Role.ADMIN, Role.SYSTEM)) {
+            throw ForbiddenException(ErrorCode.E0009)
+        }
+
+        orderRepository.changeOrderDetailStatus(orderDetailId, orderStatus)
+        val orderDetailEntity = orderRepository.getOrderDetail(orderDetailId)
+
         return OrderDetailResponse(
             orderDetailId = orderDetailEntity.id.value,
             reagentName = orderDetailEntity.reagentName.value,

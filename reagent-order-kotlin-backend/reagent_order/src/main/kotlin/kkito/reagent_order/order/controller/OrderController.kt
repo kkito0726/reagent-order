@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.time.LocalDateTime
 import java.util.*
@@ -70,6 +71,20 @@ class OrderController(private val orderService: OrderService) : ControllerUtil()
     @GetMapping("/order/orderDetail/{orderDetailId}")
     fun getOrderDetail(@PathVariable orderDetailId: Long): ResponseEntity<OrderDetailResponse> {
         return ResponseEntity.ok(orderService.getOrderDetail(OrderDetailId(orderDetailId)))
+    }
+
+    @PutMapping("/order/orderDetail/{orderDetailId}")
+    fun changeOrderDetailStatus(
+        @PathVariable orderDetailId: Long,
+        @RequestBody changeOrderRequest: ChangeOrderRequest
+    ): ResponseEntity<OrderDetailResponse> {
+        return ResponseEntity.ok(
+            orderService.changeOrderDetailStatus(
+                user(),
+                OrderDetailId(orderDetailId),
+                OrderStatus.fromValue(changeOrderRequest.orderStatus)
+            )
+        )
     }
 
     @DeleteMapping("/order/{orderId}")
