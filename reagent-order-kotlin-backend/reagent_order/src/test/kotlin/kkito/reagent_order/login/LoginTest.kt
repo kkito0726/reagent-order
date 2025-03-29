@@ -19,8 +19,6 @@ import kotlin.test.assertNotNull
 
 @SpringBootTest
 class LoginTest(
-    @Autowired private val mockMvc: MockMvc,
-    @Autowired private val objectMapper: ObjectMapper,
     @Autowired private val testDataAppUser: TestDataAppUser
 ) : TestSupport() {
     companion object {
@@ -48,7 +46,7 @@ class LoginTest(
         assertNotNull(
             responseBody.getString("loginId")
         )
-        val loginUser =  responseBody.getJSONObject("appUserEntity")
+        val loginUser = responseBody.getJSONObject("appUserEntity")
         assertNotNull(loginUser.getString("id"))
         assertEquals(loginUser.getString("appUserName"), "テスト 太郎")
         assertEquals(loginUser.getString("email"), "test_email@test.gmail.com")

@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delet
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 class DeleteOrderTest(
-    @Autowired private val mockMvc: MockMvc,
     @Autowired private val testDataAppUser: TestDataAppUser,
     @Autowired private val testDataOrder: TestDataOrder
 ) : TestSupport() {

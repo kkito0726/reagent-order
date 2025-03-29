@@ -7,14 +7,14 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class AppUserFixture(
-    val id: UUID = UUID.randomUUID(),
-    val appUserName: String = "テストユーザー",
+    passwordEncoder: PasswordEncoder, // 依存性注入
+    private val id: UUID = UUID.randomUUID(),
+    private val appUserName: String = "テストユーザー",
     val email: String = "test@fixture.com",
     val password: String = "Fixture12345678",
     private val createdAt: LocalDateTime = LocalDateTime.now(),
     private val deletedAt: LocalDateTime? = null,
     private val role: String = "SYSTEM",
-    passwordEncoder: PasswordEncoder // 依存性注入
 ) {
     private val encodedPassword: String = passwordEncoder.encode(password) // エンコード済みパスワード
 

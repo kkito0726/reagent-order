@@ -25,10 +25,7 @@ import kotlin.test.assertNotNull
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CreateAppUserTest(
-    @Autowired private val mockMvc: MockMvc,
-    @Autowired private val objectMapper: ObjectMapper,
-) : TestSupport() {
+class CreateAppUserTest : TestSupport() {
 
     companion object {
         private val TABLE_NAMES = listOf("app_user")
