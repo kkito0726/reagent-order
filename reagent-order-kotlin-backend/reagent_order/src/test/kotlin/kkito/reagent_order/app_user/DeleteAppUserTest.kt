@@ -19,7 +19,6 @@ import kotlin.test.assertEquals
 @SpringBootTest
 @AutoConfigureMockMvc
 class DeleteAppUserTest(
-    @Autowired private val mockMvc: MockMvc,
     @Autowired private val testDataAppUser: TestDataAppUser,
 ) : TestSupport() {
     companion object {

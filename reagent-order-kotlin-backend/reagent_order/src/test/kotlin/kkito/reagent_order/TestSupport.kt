@@ -1,5 +1,6 @@
 package kkito.reagent_order
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.generate.jooq.Tables.APP_USER
 import com.generate.jooq.Tables.ORDER_DETAIL
 import com.generate.jooq.Tables.ORDER_SET
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import java.sql.Connection
 import java.sql.DriverManager
@@ -30,6 +32,12 @@ open class TestSupport {
 
     @Autowired
     lateinit var dataSource: DataSource
+
+    @Autowired
+    lateinit var mockMvc: MockMvc
+
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
 
     companion object {
         fun createDSLContext(): DSLContext {

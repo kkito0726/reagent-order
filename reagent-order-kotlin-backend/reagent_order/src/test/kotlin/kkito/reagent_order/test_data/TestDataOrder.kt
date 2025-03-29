@@ -13,9 +13,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @Component
-class TestDataOrder {
-    companion object {
-        val defaultOrderRequest = UserOrderRequest(
+class TestDataOrder(
+    val userOrderRequest: UserOrderRequest = UserOrderRequest(
             "テスト 試薬発注申請A",
             listOf(
                 OrderDetailRequest(
@@ -30,7 +29,7 @@ class TestDataOrder {
                 )
             )
         )
-    }
+) {
 
     @Autowired
     lateinit var mockMvc: MockMvc
@@ -39,7 +38,7 @@ class TestDataOrder {
     lateinit var objectMapper: ObjectMapper
 
     fun createOrder(
-        orderRequest: UserOrderRequest = defaultOrderRequest,
+        orderRequest: UserOrderRequest = userOrderRequest,
         jwtToken: String
     ): ResultActions {
         return mockMvc.perform(
