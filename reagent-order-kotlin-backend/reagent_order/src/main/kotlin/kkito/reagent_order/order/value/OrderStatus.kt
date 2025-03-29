@@ -6,7 +6,7 @@ import kkito.reagent_order.error.InternalServerError
 enum class OrderStatus(val value: String, val description: String) {
     PENDING("pending", "承認待ち"),
     COMPLETED("completed", "発注完了"),
-    CANCELED("canceled", "キャンセル");
+    CANCELLED("cancelled", "キャンセル");
 
     companion object {
         fun fromValue(value: String): OrderStatus {

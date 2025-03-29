@@ -1,6 +1,7 @@
 package kkito.reagent_order.lib.fixture
 
 import com.generate.jooq.Tables
+import kkito.reagent_order.app_user.value.Role
 import org.jooq.DSLContext
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDateTime
@@ -14,7 +15,7 @@ class AppUserFixture(
     val password: String = "Fixture12345678",
     private val createdAt: LocalDateTime = LocalDateTime.now(),
     private val deletedAt: LocalDateTime? = null,
-    private val role: String = "SYSTEM",
+    private val role: String = Role.SYSTEM.value,
 ) {
     private val encodedPassword: String = passwordEncoder.encode(password) // エンコード済みパスワード
 
