@@ -19,9 +19,9 @@ jooq {
             jooqConfiguration.apply {
                 jdbc = org.jooq.meta.jaxb.Jdbc().apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://localhost:5432/main"
-                    user = "sa"
-                    password = "pass1234"
+                    url = System.getenv("JDBC_URL") ?: "jdbc:postgresql://localhost:5432/main"
+                    user = System.getenv("DB_USER") ?: "sa"
+                    password = System.getenv("DB_PASSWORD") ?: "pass1234"
                 }
                 generator = org.jooq.meta.jaxb.Generator().apply {
                     name = "org.jooq.codegen.DefaultGenerator"

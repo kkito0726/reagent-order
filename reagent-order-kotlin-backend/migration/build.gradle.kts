@@ -11,10 +11,10 @@ dependencies {
 }
 
 flyway {
-	url = "jdbc:postgresql://localhost:5432/main"
-	user = "sa"
-	password = "pass1234"
-	locations = arrayOf("filesystem:src/main/resources/db/migration")
+	url = System.getenv("JDBC_URL") ?: "jdbc:postgresql://localhost:5432/main"
+	user = System.getenv("DB_USER") ?: "sa"
+	password = System.getenv("DB_PASSWORD") ?: "pass1234"
+	locations = arrayOf(System.getenv("FLYWAY_LOCATIONS") ?: "filesystem:src/main/resources/db/migration")
 }
 
 

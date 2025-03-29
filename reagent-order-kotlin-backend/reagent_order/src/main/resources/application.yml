@@ -2,9 +2,9 @@ spring:
   application:
     name: reagent_order
   datasource:
-    url: jdbc:postgresql://localhost:5432/main
-    username: sa
-    password: pass1234
+    url: ${JDBC_URL:jdbc:postgresql://localhost:5432/main}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:pass1234}
     driver-class-name: org.postgresql.Driver
 
 logging:

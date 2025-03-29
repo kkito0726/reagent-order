@@ -8,10 +8,22 @@ services:
       POSTGRES_USER: sa
       POSTGRES_PASSWORD: pass1234
       POSTGRES_DB: main
+      POSTGRES_HOST_AUTH_METHOD: trust  # 認証方式を trust にして接続しやすくする
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  reagent-order-app:
+    build:
+      context: .
+      dockerfile: ./docker/reagent_order/Dockerfile
+    environment:
+      - JDBC_URL=jdbc:postgresql://db:5432/main
+      - DB_USER=sa
+      - DB_PASSWORD=pass1234
+    depends_on:
+      - db
 
 volumes:
   pgdata:
