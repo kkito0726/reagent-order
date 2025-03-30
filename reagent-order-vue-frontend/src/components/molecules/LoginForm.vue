@@ -33,10 +33,16 @@
     <button
       type="submit"
       @click="handleSubmit"
-      class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transform transition-all duration-200 ease-in-out hover:scale-[1.02] shadow-lg hover:shadow-xl"
+      :disabled="isLoading"
+      class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transform transition-all duration-200 ease-in-out hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      ログイン
+      <span v-if="!isLoading">ログイン</span>
+      <span v-else>ログイン中...</span>
     </button>
+
+    <div v-if="error" class="text-red-600 text-sm text-center">
+      {{ error }}
+    </div>
 
     <div class="relative">
       <div class="absolute inset-0 flex items-center">
@@ -92,16 +98,30 @@ const authStore = useAuthStore();
 
 const email = ref("");
 const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
 
 async function handleSubmit() {
+  if (!email.value || !password.value) {
+    error.value = "メールアドレスとパスワードを入力してください。";
+    return;
+  }
+
   try {
+    isLoading.value = true;
+    error.value = "";
+
     await authStore.login({
       email: email.value,
       password: password.value,
     });
+
     router.push("/home");
-  } catch (error) {
-    console.error("Login failed:", error);
+  } catch (e) {
+    error.value =
+      "ログインに失敗しました。メールアドレスとパスワードを確認してください。";
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>
