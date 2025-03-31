@@ -1,6 +1,5 @@
 package kkito.reagent_order.app_user
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.app_user.value.UpdateAppUserRequest
 import kkito.reagent_order.app_user.value.Role
@@ -18,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
@@ -35,14 +33,15 @@ class UpdateAppUserTest(
         private val TABLE_NAMES = listOf("app_user")
     }
 
-    private lateinit var createdUserResponse: JSONObject
+    private lateinit var appUser: JSONObject
     private lateinit var jwtToken: String
 
     @BeforeEach
     override fun setUp() {
         super.setUp()
-        createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
-        jwtToken = testDataAppUser.login()
+        val createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
+        appUser = createdUserResponse.getJSONObject("appUserEntity")
+        jwtToken = createdUserResponse.getString("token")
     }
 
     @ParameterizedTest
@@ -67,7 +66,7 @@ class UpdateAppUserTest(
 
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -105,15 +104,15 @@ class UpdateAppUserTest(
         val systemUserJwt = testDataAppUser.login(systemUser.email, systemUser.password)
 
         val request = UpdateAppUserRequest(
-            createdUserResponse.getString("appUserName"),
-            createdUserResponse.getString("email"),
+            appUser.getString("appUserName"),
+            appUser.getString("email"),
             "Test_pass_12345678",
             Role.ADMIN.value
         )
 
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $systemUserJwt")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -157,7 +156,7 @@ class UpdateAppUserTest(
 
         val changes = createChanges(TABLE_NAMES).setStartPointNow()
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -189,7 +188,7 @@ class UpdateAppUserTest(
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -216,7 +215,7 @@ class UpdateAppUserTest(
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -256,7 +255,7 @@ class UpdateAppUserTest(
 
     @Test
     fun 退会済みのユーザーを更新しようとする場合_E0006エラーになる() {
-        testDataAppUser.deleteAppUser(createdUserResponse.getString("id"), jwtToken)
+        testDataAppUser.deleteAppUser(appUser.getString("id"), jwtToken)
 
         val request = UpdateAppUserRequest(
             "てすと 太郎",
@@ -266,7 +265,7 @@ class UpdateAppUserTest(
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -288,7 +287,7 @@ class UpdateAppUserTest(
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer Invalid token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -309,7 +308,7 @@ class UpdateAppUserTest(
         )
 
         val resultActions = mockMvc.perform(
-            put("/app_user/${createdUserResponse.getString("id")}")
+            put("/app_user/${appUser.getString("id")}")
                 .header("Authorization", "Bearer $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))

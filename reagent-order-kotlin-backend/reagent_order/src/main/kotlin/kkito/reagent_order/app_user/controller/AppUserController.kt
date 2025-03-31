@@ -3,6 +3,7 @@ package kkito.reagent_order.app_user.controller
 import kkito.reagent_order.app_user.entity.AppUserEntity
 import kkito.reagent_order.app_user.service.AppUserService
 import kkito.reagent_order.app_user.value.*
+import kkito.reagent_order.login.value.LoginResponse
 import kkito.reagent_order.util.ControllerUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -19,7 +20,7 @@ class AppUserController(
     private val appUserService: AppUserService,
 ) : ControllerUtil() {
     @PostMapping("/app_user/create")
-    fun createAppUser(@RequestBody createAppUserRequest: CreateAppUserRequest): ResponseEntity<AppUserResponse> {
+    fun createAppUser(@RequestBody createAppUserRequest: CreateAppUserRequest): ResponseEntity<LoginResponse> {
         val appUser = AppUserEntity(
             AppUserId(UUID.randomUUID()),
             AppUserName(createAppUserRequest.appUserName),

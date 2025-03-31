@@ -1,6 +1,5 @@
 package kkito.reagent_order.login
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.app_user.value.Role
 import kkito.reagent_order.error.ErrorCode
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import kotlin.test.assertEquals
@@ -32,7 +30,7 @@ class LoginTest(
 
     @Test
     fun ログインできる() {
-        val resisterUser = createResponseBodyJson(testDataAppUser.createAppUser())
+        val resisterUser = createResponseBodyJson(testDataAppUser.createAppUser()).getJSONObject("appUserEntity")
         val request = LoginRequest(
             resisterUser.getString("email"),
             "Test_pass_12345678"
@@ -56,7 +54,7 @@ class LoginTest(
 
     @Test
     fun パスワードが間違っている場合_ログインできない_E0008エラーになる() {
-        val resisterUser = createResponseBodyJson(testDataAppUser.createAppUser())
+        val resisterUser = createResponseBodyJson(testDataAppUser.createAppUser()).getJSONObject("appUserEntity")
         val request = LoginRequest(
             resisterUser.getString("email"),
             "Bad_Password"

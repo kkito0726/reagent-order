@@ -1,36 +1,36 @@
 package kkito.reagent_order.app_user.service
 
 import kkito.reagent_order.app_user.entity.AppUserEntity
-import kkito.reagent_order.app_user.value.AppUserResponse
 import kkito.reagent_order.app_user.repository.AppUserRepository
 import kkito.reagent_order.app_user.service.spec.AppUserCreateSpec
 import kkito.reagent_order.app_user.service.spec.AppUserDeleteSpec
 import kkito.reagent_order.app_user.service.spec.AppUserUpdateSpec
-import kkito.reagent_order.app_user.value.AppUserDto
-import kkito.reagent_order.app_user.value.AppUserId
+import kkito.reagent_order.app_user.value.*
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.error.NotFoundException
+import kkito.reagent_order.login.service.LoginService
+import kkito.reagent_order.login.value.LoginResponse
 import org.springframework.stereotype.Service
 
 @Service
 open class AppUserService(
     private val appUserCreateSpec: AppUserCreateSpec,
+    private val loginService: LoginService,
     private val appUserUpdateSpec: AppUserUpdateSpec,
     private val appUserDeleteSpec: AppUserDeleteSpec,
     private val appUserRepository: AppUserRepository
 ) {
-    fun createAppUser(appUserEntity: AppUserEntity): AppUserResponse {
+    fun createAppUser(appUserEntity: AppUserEntity): LoginResponse {
         // アプリユーザが重複していないかの確認
         appUserCreateSpec.check(appUserEntity)
 
         // 永続化
         appUserRepository.createAppUser(appUserEntity)
-        return AppUserResponse(
-            appUserEntity.id.toString(),
-            appUserEntity.appUserName.toString(),
-            appUserEntity.email.toString(),
-            appUserEntity.createdAt,
-            appUserEntity.role
+
+        // 作成したユーザーでログイン処理
+        return loginService.getAppUser(
+            Email(appUserEntity.email.value),
+            Password(appUserEntity.password.value)
         )
     }
 
