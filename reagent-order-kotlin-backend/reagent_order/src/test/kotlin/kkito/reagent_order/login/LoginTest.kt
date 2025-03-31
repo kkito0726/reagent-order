@@ -44,7 +44,7 @@ class LoginTest(
         ).andExpect(status().isOk)
         val responseBody = createResponseBodyJson(resultActions)
         assertNotNull(
-            responseBody.getString("loginId")
+            responseBody.getString("token")
         )
         val loginUser = responseBody.getJSONObject("appUserEntity")
         assertNotNull(loginUser.getString("id"))
