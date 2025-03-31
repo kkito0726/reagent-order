@@ -19,7 +19,7 @@ export class AuthRepository extends BaseRepository {
   }
 
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await this.post<LoginResponse>("/auth/login", data);
+    const response = await this.post<LoginResponse>("/api/auth/login", data);
     localStorage.setItem("token", response.data.token);
     return response.data;
   }
