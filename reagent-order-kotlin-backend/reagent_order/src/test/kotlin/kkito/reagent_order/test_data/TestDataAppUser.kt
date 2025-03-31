@@ -57,7 +57,7 @@ class TestDataAppUser {
                 .content(objectMapper.writeValueAsString(request))
         ).andExpect(MockMvcResultMatchers.status().isOk)
         val responseBody = createResponseBodyJson(resultActions)
-        return responseBody.getString("loginId")
+        return responseBody.getString("token")
     }
 
     private fun createResponseBodyJson(resultAction: ResultActions): JSONObject {

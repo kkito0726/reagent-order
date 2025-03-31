@@ -1,6 +1,5 @@
 package kkito.reagent_order.app_user
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.generate.jooq.Tables.APP_USER
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.app_user.value.CreateAppUserRequest
@@ -11,11 +10,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
@@ -52,18 +49,20 @@ class CreateAppUserTest : TestSupport() {
 
         // レスポンスのアサート
         val responseBody = createResponseBodyJson(resultAction)
-        assertNotNull(responseBody.getString("id"))
-        assertEquals(responseBody.getString("appUserName"), request.appUserName)
-        assertEquals(responseBody.getString("email"), request.email)
+        val appUserEntity = responseBody.getJSONObject("appUserEntity")
+        assertNotNull(appUserEntity.getString("id"))
+        assertEquals(appUserEntity.getString("appUserName"), request.appUserName)
+        assertEquals(appUserEntity.getString("email"), request.email)
         val password = dslContext.select(APP_USER.PASSWORD).from(APP_USER)
-            .where(APP_USER.ID.eq(responseBody.getString("id"))).fetchOne()?.get("password")
+            .where(APP_USER.ID.eq(appUserEntity.getString("id"))).fetchOne()?.get("password")
             .toString()
         assertEquals(
-            responseBody.getString("createdAt").substring(0, 10), LocalDate.now().format(
+            appUserEntity.getString("createdAt").substring(0, 10), LocalDate.now().format(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")
             )
         )
-        assertEquals(responseBody.getString("role"), Role.USER.value)
+        assertEquals(appUserEntity.getString("role"), Role.USER.value)
+        assertNotNull(responseBody.getString("token"))
 
         // DBアサート
         Assertions.assertThat(changes)

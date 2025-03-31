@@ -1,6 +1,5 @@
 package kkito.reagent_order.order
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kkito.reagent_order.TestSupport
 import kkito.reagent_order.error.ErrorCode
 import kkito.reagent_order.order.value.OrderDetailRequest
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -29,14 +27,15 @@ class CreateOrderTest(
         private val TABLE_NAMES = listOf("app_user", "user_order", "order_detail", "order_set")
     }
 
-    private lateinit var createdUserResponse: JSONObject
+    private lateinit var appUser: JSONObject
     private lateinit var jwtToken: String
 
     @BeforeEach
     override fun setUp() {
         super.setUp()
-        createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
-        jwtToken = testDataAppUser.login()
+        val createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
+        appUser = createdUserResponse.getJSONObject("appUserEntity")
+        jwtToken = createdUserResponse.getString("token")
     }
 
     @Test
@@ -98,7 +97,7 @@ class CreateOrderTest(
             .isCreation()
             .rowAtEndPoint()
             .value("id").isNotNull()
-            .value("app_user_id").isEqualTo(createdUserResponse.getString("id"))
+            .value("app_user_id").isEqualTo(appUser.getString("id"))
             .value("title").isEqualTo(request.title)
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()
@@ -217,7 +216,7 @@ class CreateOrderTest(
             .isCreation()
             .rowAtEndPoint()
             .value("id").isNotNull()
-            .value("app_user_id").isEqualTo(createdUserResponse.getString("id"))
+            .value("app_user_id").isEqualTo(appUser.getString("id"))
             .value("title").isEqualTo(request.title)
             .value("created_at").isNotNull()
             .value("deleted_at").isNull()

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.stream.IntStream
@@ -23,29 +22,28 @@ class GetOrderTest(
     @Autowired private val testDataAppUser: TestDataAppUser,
     @Autowired private val testDataOrder: TestDataOrder,
 ) : TestSupport() {
-    private lateinit var createdUserResponse: JSONObject
+    private lateinit var appUser: JSONObject
     private lateinit var jwtToken: String
 
-    private lateinit var otherCreateUserResponse: JSONObject
+    private lateinit var otherUser: JSONObject
     private lateinit var otherJwtToken: String
 
     @BeforeEach
     override fun setUp() {
         super.setUp()
-        createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
-        jwtToken = testDataAppUser.login()
+        val createdUserResponse = createResponseBodyJson(testDataAppUser.createAppUser())
+        appUser = createdUserResponse.getJSONObject("appUserEntity")
+        jwtToken = createdUserResponse.getString("token")
 
-        otherCreateUserResponse = createResponseBodyJson(
+        val otherCreateUserResponse = createResponseBodyJson(
             testDataAppUser.createAppUser(
                 appUserName = "サブユーザー",
                 email = "sum_mail@test.gmail.com",
                 password = "SubPassword123"
             )
         )
-        otherJwtToken = testDataAppUser.login(
-            email = "sum_mail@test.gmail.com",
-            password = "SubPassword123"
-        )
+        otherUser = otherCreateUserResponse.getJSONObject("appUserEntity")
+        otherJwtToken = otherCreateUserResponse.getString("token")
     }
 
     @Test
@@ -90,8 +88,8 @@ class GetOrderTest(
         testDataOrder.createOrder(requestOrders[0], jwtToken)
         testDataOrder.createOrder(requestOrders[1], otherJwtToken)
         val userNames = listOf(
-            createdUserResponse.getString("appUserName"),
-            otherCreateUserResponse.getString("appUserName")
+            appUser.getString("appUserName"),
+            otherUser.getString("appUserName")
         )
         val resultActions = mockMvc.perform(
             get("/order").contentType(MediaType.APPLICATION_JSON)
