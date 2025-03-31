@@ -22,14 +22,24 @@ class JwtAuthenticationFilter(
     private val loginRepository: LoginRepository,
     private val objectMapper: ObjectMapper
 ) : OncePerRequestFilter() {
+    companion object {
+        val NO_AUTH_URI_LIST = listOf(
+            "/health",
+            "/app_user/create",
+            "/api/auth/login"
+        )
+    }
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        return request.method.equals("OPTIONS", ignoreCase = true)
+    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        if (request.requestURI == "/app_user/create" || request.requestURI == "/api/auth/login") {
-            filterChain.doFilter(request, response) // スキップ
+        if (request.requestURI in NO_AUTH_URI_LIST) {
+            filterChain.doFilter(request, response)
             return
         }
         try {
@@ -53,7 +63,6 @@ class JwtAuthenticationFilter(
                 )
             )
         }
-
     }
 
     private fun extractToken(request: HttpServletRequest): String {
