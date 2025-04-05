@@ -1,5 +1,5 @@
 export type SignupRequest = {
-  name: string;
+  appUserName: string;
   email: string;
   password: string;
 };

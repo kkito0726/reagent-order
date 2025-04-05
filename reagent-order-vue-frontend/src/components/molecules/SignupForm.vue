@@ -86,6 +86,11 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import BaseInput from "../atoms/input/BaseInput.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const authStore = useAuthStore();
 
 const name = ref("");
 const email = ref("");
@@ -101,13 +106,19 @@ const isFormValid = computed(() => {
   );
 });
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!isFormValid.value) return;
-  // TODO: サインアップ処理の実装
-  console.log("Signup attempt:", {
-    name: name.value,
-    email: email.value,
-    password: password.value,
-  });
+
+  try {
+    await authStore.signup({
+      appUserName: name.value,
+      email: email.value,
+      password: password.value,
+    });
+
+    router.push("/home");
+  } catch (e) {
+    console.error(e);
+  }
 }
 </script>
