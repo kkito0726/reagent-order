@@ -45,8 +45,11 @@ export class BaseRepository {
     path: string,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response = await this.axios.get<ApiResponse<T>>(path, config);
-    return response.data;
+    const response = await this.axios.get<T>(path, config);
+    return {
+      data: response.data,
+      status: response.status,
+    };
   }
 
   protected async post<T>(
@@ -54,8 +57,11 @@ export class BaseRepository {
     data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response = await this.axios.post<ApiResponse<T>>(path, data, config);
-    return response.data;
+    const response = await this.axios.post<T>(path, data, config);
+    return {
+      data: response.data,
+      status: response.status,
+    };
   }
 
   protected async put<T>(
@@ -63,15 +69,21 @@ export class BaseRepository {
     data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response = await this.axios.put<ApiResponse<T>>(path, data, config);
-    return response.data;
+    const response = await this.axios.put<T>(path, data, config);
+    return {
+      data: response.data,
+      status: response.status,
+    };
   }
 
   protected async delete<T>(
     path: string,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response = await this.axios.delete<ApiResponse<T>>(path, config);
-    return response.data;
+    const response = await this.axios.delete<T>(path, config);
+    return {
+      data: response.data,
+      status: response.status,
+    };
   }
 }

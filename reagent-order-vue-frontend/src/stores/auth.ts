@@ -3,6 +3,7 @@ import { ref } from "vue";
 import type { LoginRequest } from "@/types/login/LoginRequest";
 import type { LoginResponse } from "@/types/login/LoginResponse";
 import { AuthRepository } from "@/repositories/auth.repository";
+import type { SignupRequest } from "@/types/signup/SignupRequest";
 
 export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = ref(false);
@@ -21,6 +22,17 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  const signup = async (signupRequest: SignupRequest) => {
+    try {
+      const response = await authRepository.signup(signupRequest);
+      isAuthenticated.value = true;
+      user.value = response;
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
+    }
+  };
+
   function logout() {
     authRepository.logout();
     isAuthenticated.value = false;
@@ -31,6 +43,7 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     user,
     login,
+    signup,
     logout,
   };
 });
