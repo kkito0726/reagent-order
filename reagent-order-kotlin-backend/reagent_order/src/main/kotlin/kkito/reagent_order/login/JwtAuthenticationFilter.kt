@@ -30,7 +30,9 @@ class JwtAuthenticationFilter(
         )
     }
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return request.method.equals("OPTIONS", ignoreCase = true)
+        val uri = request.requestURI
+        return request.method.equals("OPTIONS", ignoreCase = true) ||
+                NO_AUTH_URI_LIST.any { it.equals(uri, ignoreCase = true) }
     }
 
     override fun doFilterInternal(
@@ -38,10 +40,6 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        if (request.requestURI in NO_AUTH_URI_LIST) {
-            filterChain.doFilter(request, response)
-            return
-        }
         try {
             val token = extractToken(request)
             val appUserId = jwtUtil.extractAppUserId(token)
